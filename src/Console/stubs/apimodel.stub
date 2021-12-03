@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use Leandro\ApiModel\ApiModel;
+
+class {{ class }} extends ApiModel
+{
+	protected $fields = [
+		// REST API fields to use when creating the ApiModel
+	];
+}
