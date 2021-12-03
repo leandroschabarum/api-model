@@ -6,7 +6,11 @@ use Leandro\ApiModel\ApiModel;
 
 class {{ class }} extends ApiModel
 {
-	protected $fields = [
+	protected static $fields = [
 		// REST API fields to use when creating the ApiModel
+	];
+
+	protected static $field_mapping = [
+		// REST API field name mapping to convert between in the ApiModel
 	];
 }
