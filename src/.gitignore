@@ -1,0 +1,15 @@
+*.json
+*.txt
+*.log
+*.7z
+*.gz
+*.jar
+*.rar
+*.tar
+*.zip
+*.sys
+*.ini
+*.conf
+*.cnf
+*.cfg
+*.cf
