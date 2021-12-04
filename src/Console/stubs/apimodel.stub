@@ -10,7 +10,7 @@ class {{ class }} extends ApiModel
 	/**
 	 * Respective API class for current ApiModel.
 	 */
-	protected static $ApiClass = {{ class }}Api::class;
+	protected static $apiClass = {{ class }}Api::class;
 
 	/**
 	 * REST API fields to use when creating the ApiModel.
