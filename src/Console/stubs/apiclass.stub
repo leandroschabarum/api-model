@@ -18,7 +18,7 @@ class {{ class }}
 	}
 
 	/**
-	 * Retrieve single API resource.
+	 * Retrieve multiple API resource.
 	 * 
 	 * @param  array $query
 	 * @return \Illuminate\Http\Client\Response
@@ -29,7 +29,7 @@ class {{ class }}
 	}
 
 	/**
-	 * Retrieve multiple API resources.
+	 * Retrieve single API resources.
 	 * 
 	 * @param  mixed  $id
 	 * @return \Illuminate\Http\Client\Response
