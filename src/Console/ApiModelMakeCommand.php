@@ -44,6 +44,8 @@ class ApiModelMakeCommand extends GeneratorCommand
 			return false;
 		}
 
+		$this->createApiClass();
+
 		if ($this->option('all'))
 		{
 			$this->input->setOption('controller', true);
@@ -60,6 +62,20 @@ class ApiModelMakeCommand extends GeneratorCommand
 		{
 			$this->createPolicy();
 		}
+	}
+
+	/**
+	 * Create an API class for the model.
+	 *
+	 * @return void
+	 */
+	protected function createApiClass()
+	{
+		$apiclass = Str::studly(class_basename($this->argument('name')));
+
+		$this->call('make:apiclass', array_filter([
+			'name' => is_dir(app_path('Apis')) ? "{$apiclass}Api" : "Apis/{$apiclass}Api",
+		]));
 	}
 
 	/**

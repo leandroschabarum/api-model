@@ -4,6 +4,8 @@ namespace Leandro\ApiModel\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Leandro\ApiModel\Console\ApiModelMakeCommand;
+use Leandro\ApiModel\Console\ApiClassMakeCommand;
+
 use Illuminate\Support\Facades\Log;
 
 class ApiModelServiceProvider extends ServiceProvider
@@ -15,6 +17,7 @@ class ApiModelServiceProvider extends ServiceProvider
 	 */
 	protected $commands = [
 		'ApiModelMake' => 'command.apimodel.make',
+		'ApiClassMake' => 'command.apiclass.make',
 	];
 
 	/**
@@ -66,6 +69,22 @@ class ApiModelServiceProvider extends ServiceProvider
 			function ($app)
 			{
 				return new ApiModelMakeCommand($app['files']);
+			}
+		);
+	}
+
+	/**
+	 * Register the command.
+	 *
+	 * @return void
+	 */
+	protected function registerApiClassMakeCommand()
+	{
+		$this->app->singleton(
+			'command.apiclass.make',
+			function ($app)
+			{
+				return new ApiClassMakeCommand($app['files']);
 			}
 		);
 	}
