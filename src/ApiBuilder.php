@@ -39,7 +39,7 @@ trait ApiBuilder
 	 */
 	final public static function all()
 	{
-		$api = new static::$ApiClass();
+		$api = new static::$apiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
@@ -85,7 +85,7 @@ trait ApiBuilder
 	 */
 	final public static function find($id)
 	{
-		$api = new static::$ApiClass();
+		$api = new static::$apiClass();
 		$api_method = "read" . Str::singular(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
@@ -133,7 +133,7 @@ trait ApiBuilder
 	 */
 	final public static function query(array $parameters)
 	{
-		$api = new static::$ApiClass();
+		$api = new static::$apiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
