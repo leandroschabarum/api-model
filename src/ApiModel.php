@@ -7,7 +7,6 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Concerns\HasAttributes;
 use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
@@ -36,6 +35,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	use HasGlobalScopes;
 	use HasTimestamps;
 	use ForwardsCalls;
+
+	use ApiBuilder;
 
 	/**
 	 * Constant for standard error messages.
@@ -876,7 +877,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  string|null  $field
 	 * @return ApiModel
 	 * 
-	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException|Exception
+	 * @throws Exception
 	 */
 	public function resolveRouteBinding($value, $field = null)
 	{
