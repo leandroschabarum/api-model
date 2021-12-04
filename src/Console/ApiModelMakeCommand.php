@@ -75,7 +75,7 @@ class ApiModelMakeCommand extends GeneratorCommand
 
 		$this->call('make:apiclass', array_filter([
 			'name' => is_dir(app_path('Apis')) ? "{$apiclass}Api" : "Apis/{$apiclass}Api",
-			'model' => "{$apiclass}"
+			'--apimodel' => "{$apiclass}"
 		]));
 	}
 
