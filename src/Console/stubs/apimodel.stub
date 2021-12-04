@@ -20,9 +20,45 @@ class {{ class }} extends ApiModel
 	];
 
 	/**
-	 * REST API field name mapping to convert between in the ApiModel
+	 * REST API field name mapping for automatic conversion in ApiModel.
 	 */
 	protected static $field_mapping = [
+		//
+	];
+
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		//
+	];
+
+	/**
+	 * The attributes that are set as default.
+	 *
+	 * @var array
+	 */
+	protected $attributes = [
+		//
+	];
+
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		//
+	];
+
+	/**
+	 * The attributes that should be cast to native types.
+	 *
+	 * @var array
+	 */
+	protected $casts = [
 		//
 	];
 }
