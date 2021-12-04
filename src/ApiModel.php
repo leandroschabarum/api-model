@@ -324,7 +324,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @throws InvalidArgumentException|Exception
 	 */
-	final protected static function checkResponseOk($response, bool $strict = false)
+	final protected static function isResponseOk($response, bool $strict = false)
 	{
 		$is_ok = function ($code) { return ((int) $code >= 200 && (int) $code < 300); };
 

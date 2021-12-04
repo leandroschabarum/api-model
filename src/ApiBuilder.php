@@ -30,8 +30,6 @@ trait ApiBuilder
 
 			return $model;
 		}
-
-		return $created;
 	}
 
 	/**
@@ -43,7 +41,7 @@ trait ApiBuilder
 	{
 		$api = new static::$ApiClass();
 
-		$api_method = "get" . Str::plural(self::getModelClassName());
+		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method()
 			: [
@@ -51,7 +49,7 @@ trait ApiBuilder
 				'status' => 404
 			];
 
-		if (self::checkResponseOk($response))
+		if (self::isResponseOk($response))
 		{
 			$ModelClass = static::class;
 			$data = $response->json();
@@ -82,13 +80,13 @@ trait ApiBuilder
 	/**
 	 * Static method to find an ApiModel.
 	 * 
-	 * @param  int  $id
+	 * @param  mixed  $id
 	 * @return ApiModel
 	 */
-	final public static function find(int $id)
+	final public static function find($id)
 	{
 		$api = new static::$ApiClass();
-		$api_method = "get" . Str::singular(self::getModelClassName());
+		$api_method = "read" . Str::singular(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($id)
@@ -97,7 +95,7 @@ trait ApiBuilder
 				'status' => 404
 			];
 
-		if (self::checkResponseOk($response))
+		if (self::isResponseOk($response))
 		{
 			$ModelClass = static::class;
 			$model = new $ModelClass($response->json(), true);
@@ -112,12 +110,12 @@ trait ApiBuilder
 	 * Static method to find an ApiModel, however if
 	 * it doesn't exist, throws an Exception.
 	 * 
-	 * @param  int  $id
+	 * @param  mixed  $id
 	 * @return ApiModel
 	 * 
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	final public static function findOrFail(int $id)
+	final public static function findOrFail($id)
 	{
 		$model = self::find($id);
 
@@ -137,7 +135,7 @@ trait ApiBuilder
 	{
 		$api = new static::$ApiClass();
 
-		$api_method = "get" . Str::plural(self::getModelClassName());
+		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($parameters)
 			: [
@@ -145,7 +143,7 @@ trait ApiBuilder
 				'status' => 404
 			];
 
-		if (self::checkResponseOk($response))
+		if (self::isResponseOk($response))
 		{
 			$ModelClass = static::class;
 			$data = $response->json();
@@ -223,20 +221,14 @@ trait ApiBuilder
 		}
 		else
 		{
-			$api_method = "store" . Str::singular(self::getModelClassName());
+			$api_method = "create" . Str::singular(self::getModelClassName());
 		}
 
 		$current_attributes = $this->attributesToArray();
 
-		if ($this->fireModelEvent('saving') === false)
-		{
-			return false;
-		}
+		if ($this->fireModelEvent('saving') === false) { return false; }
 
-		if (isset($model) && ! $model->hasChanges($current_attributes))
-		{
-			return true;
-		}
+		if (isset($model) && ! $model->hasChanges($current_attributes)) { return true; }
 
 		$api = new $this->api_class();
 
@@ -247,7 +239,7 @@ trait ApiBuilder
 				'status' => 404
 			];
 
-		if (self::checkResponseOk($response, $api_strict))
+		if (self::isResponseOk($response, $api_strict))
 		{
 			$pk = $this->getKeyName();
 			$this->$pk = $response[$pk] ?? null;
@@ -299,7 +291,7 @@ trait ApiBuilder
 
 		$api = new $this->api_class();
 
-		$api_method = "destroy" . Str::singular(self::getModelClassName());
+		$api_method = "delete" . Str::singular(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($pk)
 			: [
@@ -307,7 +299,7 @@ trait ApiBuilder
 				'status' => 404
 			];
 
-		if (self::checkResponseOk($response))
+		if (self::isResponseOk($response))
 		{
 			$this->exists = false;
 			$this->setAttribute($this->getKeyName(), null);

@@ -2,7 +2,63 @@
 
 namespace {{ namespace }};
 
+use Illuminate\Support\Facades\Http;
+
 class {{ class }}
 {
-	//
+	/**
+	 * Create API resource;
+	 * 
+	 * @param  array  $payload
+	 * @return \Illuminate\Http\Client\Response
+	 */
+	public function create{{ modelSingular }}(array $payload = [])
+	{
+		//
+	}
+
+	/**
+	 * Retrieve single API resource.
+	 * 
+	 * @param  array $query
+	 * @return \Illuminate\Http\Client\Response
+	 */
+	public function read{{ modelPlural }}(array $query = [])
+	{
+		//
+	}
+
+	/**
+	 * Retrieve multiple API resources.
+	 * 
+	 * @param  mixed  $id
+	 * @return \Illuminate\Http\Client\Response
+	 */
+	public function read{{ modelSingular }}($id)
+	{
+		//
+	}
+
+	/**
+	 * Update API resource.
+	 * 
+	 * @param  mixed  $id
+	 * @param  array  $payload
+	 * @return \Illuminate\Http\Client\Response
+	 */
+	public function update{{ modelSingular }}($id, array $payload = [])
+	{
+		//
+	}
+
+	/**
+	 * Delete API resource.
+	 * 
+	 * @param  mixed  $id
+	 * @return \Illuminate\Http\Client\Response
+	 */
+	public function delete{{ modelSingular }}($id)
+	{
+		//
+	}
 }

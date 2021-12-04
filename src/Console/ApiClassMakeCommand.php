@@ -4,6 +4,8 @@ namespace Leandro\ApiModel\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputOption;
 
 class ApiClassMakeCommand extends GeneratorCommand
@@ -42,6 +44,59 @@ class ApiClassMakeCommand extends GeneratorCommand
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Build the class with the given name.
+	 *
+	 * @param  string  $name
+	 * @return string
+	 */
+	protected function buildClass($name)
+	{
+		$stub = parent::buildClass($name);
+
+		$model = $this->option('apimodel');
+
+		return $this->replaceModel($stub, $model);
+	}
+
+	/**
+	 * Replace the model for the given stub.
+	 *
+	 * @param  string  $stub
+	 * @param  string  $model
+	 * @return string
+	 */
+	protected function replaceModel($stub, $model)
+	{
+		$modelClass = $this->parseModel($model);
+
+		$replace = [
+			'{{ modelSingular }}' => Str::singular(class_basename($modelClass)),
+			'{{ modelPlural }}' => Str::plural(class_basename($modelClass)),
+		];
+
+		return str_replace(
+			array_keys($replace), array_values($replace), $stub
+		);
+	}
+
+	/**
+	 * Get the fully-qualified model class name.
+	 *
+	 * @param  string  $model
+	 * @return string
+	 *
+	 * @throws \InvalidArgumentException
+	 */
+	protected function parseModel($model)
+	{
+		if (preg_match('([^A-Za-z0-9_/\\\\])', $model)) {
+			throw new InvalidArgumentException('Model name contains invalid characters.');
+		}
+
+		return $this->qualifyModel($model);
 	}
 
 	/**
@@ -84,7 +139,8 @@ class ApiClassMakeCommand extends GeneratorCommand
 	protected function getOptions()
 	{
 		return [
-			['force', null, InputOption::VALUE_NONE, 'Create the class even if it already exists']
+			['force', null, InputOption::VALUE_NONE, 'Create the class even if it already exists'],
+			['apimodel', 'm', InputOption::VALUE_OPTIONAL, 'The API model that the class applies to.']
 		];
 	}
 }
