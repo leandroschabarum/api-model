@@ -1,0 +1,64 @@
+<?php
+
+namespace {{ namespace }};
+
+use Leandro\ApiModel\ApiModel;
+use App\Apis\{{ class }}Api;
+
+class {{ class }} extends ApiModel
+{
+	/**
+	 * Respective API class for current ApiModel.
+	 */
+	protected static $apiClass = {{ class }}Api::class;
+
+	/**
+	 * REST API fields to use when creating the ApiModel.
+	 */
+	protected static $fields = [
+		//
+	];
+
+	/**
+	 * REST API field name mapping for automatic conversion in ApiModel.
+	 */
+	protected static $field_mapping = [
+		//
+	];
+
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		//
+	];
+
+	/**
+	 * The attributes that are set as default.
+	 *
+	 * @var array
+	 */
+	protected $attributes = [
+		//
+	];
+
+	/**
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
+	protected $hidden = [
+		//
+	];
+
+	/**
+	 * The attributes that should be cast to native types.
+	 *
+	 * @var array
+	 */
+	protected $casts = [
+		//
+	];
+}
