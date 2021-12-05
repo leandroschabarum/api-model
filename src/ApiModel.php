@@ -1068,7 +1068,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$totallyGuarded = $this->totallyGuarded();
 		$properties = array_filter(
 			array_merge(array_fill_keys(static::$fields, null), self::convertIdToNamedFields($properties)),
-			function ($attr) { return preg_match('%^[a-zA-Z][a-zA-Z0-9]+$%', (string) $attr); },
+			function ($attr) { return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr); },
 			ARRAY_FILTER_USE_KEY
 		);
 
