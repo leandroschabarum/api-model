@@ -53,17 +53,19 @@ trait ApiBuilder
 		if (self::isResponseOk($response))
 		{
 			$ModelClass = self::getModelClass();
-			$data = $response->json();
-			$models = array();
+			$contents = is_array($response) ? $response : $response->json();
 
-			foreach ($data['data'] as $attributes)
-			{
-				$models[] = new $ModelClass($attributes, true);
-			}
+			$models = array_map(
+				function ($attr) use ($ModelClass)
+				{
+					return new $ModelClass($attr, true);
+				},
+				($contents[self::getDataField()] ?? [])
+			);
 
 			return [
 				'collection' => collect($models),
-				'all' => $data['all']
+				'count' => count($models)
 			];
 		}
 		else
@@ -100,7 +102,7 @@ trait ApiBuilder
 		if (self::isResponseOk($response))
 		{
 			$ModelClass = self::getModelClass();
-			$model = new $ModelClass($response->json(), true);
+			$model = new $ModelClass((is_array($response) ? $response : $response->json()), true);
 
 			return $model;
 		}
@@ -149,19 +151,19 @@ trait ApiBuilder
 		if (self::isResponseOk($response))
 		{
 			$ModelClass = self::getModelClass();
-			$data = $response->json();
+			$contents = is_array($response) ? $response : $response->json();
 
 			$models = array_map(
 				function ($attr) use ($ModelClass)
 				{
 					return new $ModelClass($attr, true);
 				},
-				($data['data'] ?? [])
+				($contents[self::getDataField()] ?? [])
 			);
 
 			return [
 				'collection' => collect($models),
-				'all' => ($data['all'] ?? null)
+				'count' => count($models)
 			];
 		}
 		else
@@ -185,7 +187,7 @@ trait ApiBuilder
 	 */
 	final public function update(array $properties)
 	{
-		if (!empty($properties) && $this->fireModelEvent('updating') === true)
+		if (! empty($properties) && $this->fireModelEvent('updating') === true)
 		{
 			$this->fill($properties);
 			$updated = $this->save();
@@ -199,8 +201,6 @@ trait ApiBuilder
 
 			return $updated;
 		}
-
-		return true;
 	}
 
 	/**
