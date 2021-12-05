@@ -18,7 +18,7 @@ trait ApiBuilder
 	 */
 	final public static function create(array $properties)
 	{
-		$ModelClass = static::class;
+		$ModelClass = self::getModelClass();
 
 		$model = new $ModelClass($properties);
 		$model->fireModelEvent('creating', false);
@@ -39,40 +39,43 @@ trait ApiBuilder
 	 */
 	final public static function all()
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method()
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
-			$data = $response->json();
-			$models = array();
+			$ModelClass = self::getModelClass();
+			$contents = is_array($response) ? $response : $response->json();
 
-			foreach ($data['data'] as $attributes)
-			{
-				$models[] = new $ModelClass($attributes, true);
-			}
+			$models = array_map(
+				function ($attr) use ($ModelClass)
+				{
+					return new $ModelClass($attr, true);
+				},
+				($contents[self::getDataField()] ?? [])
+			);
 
 			return [
 				'collection' => collect($models),
-				'all' => $data['all']
+				'count' => count($models)
 			];
 		}
 		else
 		{
-			$status = is_array($response) ? $response['status'] : $response->status();
+			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
 
 			return [
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
-				'status' => $status,
-				'error' => (is_array($response) ? $response : $response->json())
+				'error' => (is_array($response) ? $response : $response->json()),
+				self::getStatusCodeField() => $status
 			];
 		}
 	}
@@ -85,20 +88,21 @@ trait ApiBuilder
 	 */
 	final public static function find($id)
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 		$api_method = "read" . Str::singular(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($id)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
-			$model = new $ModelClass($response->json(), true);
+			$ModelClass = self::getModelClass();
+			$model = new $ModelClass((is_array($response) ? $response : $response->json()), true);
 
 			return $model;
 		}
@@ -133,42 +137,43 @@ trait ApiBuilder
 	 */
 	final public static function query(array $parameters)
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($parameters)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
-			$data = $response->json();
+			$ModelClass = self::getModelClass();
+			$contents = is_array($response) ? $response : $response->json();
 
 			$models = array_map(
 				function ($attr) use ($ModelClass)
 				{
 					return new $ModelClass($attr, true);
 				},
-				($data['data'] ?? [])
+				($contents[self::getDataField()] ?? [])
 			);
 
 			return [
 				'collection' => collect($models),
-				'all' => ($data['all'] ?? null)
+				'count' => count($models)
 			];
 		}
 		else
 		{
-			$status = is_array($response) ? $response['status'] : $response->status();
+			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
 
 			return [
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
-				'status' => $status,
-				'error' => (is_array($response) ? $response : $response->json())
+				'error' => (is_array($response) ? $response : $response->json()),
+				self::getStatusCodeField() => $status
 			];
 		}
 	}
@@ -182,7 +187,7 @@ trait ApiBuilder
 	 */
 	final public function update(array $properties)
 	{
-		if (!empty($properties) && $this->fireModelEvent('updating') === true)
+		if (! empty($properties) && $this->fireModelEvent('updating') === true)
 		{
 			$this->fill($properties);
 			$updated = $this->save();
@@ -196,8 +201,6 @@ trait ApiBuilder
 
 			return $updated;
 		}
-
-		return true;
 	}
 
 	/**
@@ -230,13 +233,14 @@ trait ApiBuilder
 
 		if (isset($model) && ! $model->hasChanges($current_attributes)) { return true; }
 
-		$api = new $this->api_class();
+		$ApiClass = $this->getObjApiClass();
+		$api = new $ApiClass();
 
 		$response = method_exists($api, $api_method)
 			? (isset($model) ? $api->$api_method($pk, $current_attributes) : $api->$api_method($current_attributes))
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				$this->getObjStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response, $api_strict))
@@ -251,12 +255,12 @@ trait ApiBuilder
 			return true;
 		}
 
-		$status = is_array($response) ? $response['status'] : $response->status();
+		$status = is_array($response) ? $response[$this->getObjStatusCodeField()] : $response->status();
 
 		return [
 			'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['saving_model_failed']),
-			'status' => $status,
-			'error' => (is_array($response) ? $response : $response->json())
+			'error' => (is_array($response) ? $response : $response->json()),
+			$this->getObjStatusCodeField() => $status
 		];
 	}
 
@@ -289,14 +293,15 @@ trait ApiBuilder
 		if (! $this->exists) { return true; }
 		if ($this->fireModelEvent('deleting') === false) { return false; }
 
-		$api = new $this->api_class();
+		$ApiClass = $this->getObjApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "delete" . Str::singular(self::getModelClassName());
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($pk)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				$this->getObjStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
