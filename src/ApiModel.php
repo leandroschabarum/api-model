@@ -243,7 +243,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	public static function getModelClass()
+	final public static function getModelClass()
 	{
 		return static::class;
 	}
@@ -254,7 +254,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	public static function getModelClassName()
+	final public static function getModelClassName()
 	{
 		return class_basename(static::class);
 	}
@@ -265,7 +265,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	public static function getApiClass()
+	final public static function getApiClass()
 	{
 		if (class_exists(static::$apiClass))
 		{
@@ -286,18 +286,9 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	public static function getApiClassName()
+	final public static function getApiClassName()
 	{
-		if (class_exists(static::$apiClass))
-		{
-			return class_basename(static::$apiClass);
-		}
-
-		throw new Exception(sprintf("%s (%s) - %s",
-			self::getModelClassName(),
-			class_basename(static::$apiClass),
-			self::DEFAULT_ERRORS['invalid_api_class']
-		));
+		return class_basename(self::getApiClass());
 	}
 
 	/**
