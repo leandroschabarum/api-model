@@ -5,6 +5,15 @@
 
 Extendable class for REST API based models that integrates common Laravel's Model class functionalities.
 
+----
+
+### Usage
+
+After running the artisan command to generate your ApiModel, it is necessary to add
+your endpoints to the respective API class that is generated along with the model.
+
+This is the interface used to manipulate API resources over HTTP requests and is critical
+for the inner workings of your model. The ApiModel should behave similar to the Model class from Laravel.
 
 ### Artisan Command
 
