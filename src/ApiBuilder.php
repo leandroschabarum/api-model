@@ -18,7 +18,7 @@ trait ApiBuilder
 	 */
 	final public static function create(array $properties)
 	{
-		$ModelClass = static::class;
+		$ModelClass = self::getModelClass();
 
 		$model = new $ModelClass($properties);
 		$model->fireModelEvent('creating', false);
@@ -39,7 +39,8 @@ trait ApiBuilder
 	 */
 	final public static function all()
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
@@ -51,7 +52,7 @@ trait ApiBuilder
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
+			$ModelClass = self::getModelClass();
 			$data = $response->json();
 			$models = array();
 
@@ -85,7 +86,8 @@ trait ApiBuilder
 	 */
 	final public static function find($id)
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 		$api_method = "read" . Str::singular(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
@@ -97,7 +99,7 @@ trait ApiBuilder
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
+			$ModelClass = self::getModelClass();
 			$model = new $ModelClass($response->json(), true);
 
 			return $model;
@@ -133,7 +135,8 @@ trait ApiBuilder
 	 */
 	final public static function query(array $parameters)
 	{
-		$api = new static::$apiClass();
+		$ApiClass = self::getApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "read" . Str::plural(self::getModelClassName());
 		$response = method_exists($api, $api_method)
@@ -145,7 +148,7 @@ trait ApiBuilder
 
 		if (self::isResponseOk($response))
 		{
-			$ModelClass = static::class;
+			$ModelClass = self::getModelClass();
 			$data = $response->json();
 
 			$models = array_map(
@@ -230,7 +233,8 @@ trait ApiBuilder
 
 		if (isset($model) && ! $model->hasChanges($current_attributes)) { return true; }
 
-		$api = new $this->api_class();
+		$ApiClass = $this->getObjApiClass();
+		$api = new $ApiClass();
 
 		$response = method_exists($api, $api_method)
 			? (isset($model) ? $api->$api_method($pk, $current_attributes) : $api->$api_method($current_attributes))
@@ -289,7 +293,8 @@ trait ApiBuilder
 		if (! $this->exists) { return true; }
 		if ($this->fireModelEvent('deleting') === false) { return false; }
 
-		$api = new $this->api_class();
+		$ApiClass = $this->getObjApiClass();
+		$api = new $ApiClass();
 
 		$api_method = "delete" . Str::singular(self::getModelClassName());
 		$response = method_exists($api, $api_method)

@@ -160,7 +160,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @var string
 	 */
-	protected $model_class = null;
+	private $model_class = null;
 
 	/**
 	 * Property that stores the class
@@ -169,7 +169,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @var string
 	 */
-	protected $api_class = null;
+	private $api_class = null;
 
 	/**
 	 * Property that stores the status code field
@@ -238,14 +238,45 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	protected $touches = [];
 
 	/**
+	 * Static method to return the
+	 * class extending ApiModel.
+	 * 
+	 * @return string
+	 */
+	public static function getModelClass()
+	{
+		return static::class;
+	}
+
+	/**
 	 * Static method to return the name
 	 * of the ApiModel extending class.
 	 * 
 	 * @return string
 	 */
-	private static function getModelClassName()
+	public static function getModelClassName()
 	{
 		return class_basename(static::class);
+	}
+
+	/**
+	 * Static method to return the class
+	 * making API calls for the ApiModel object.
+	 * 
+	 * @return string
+	 */
+	public static function getApiClass()
+	{
+		if (class_exists(static::$apiClass))
+		{
+			return static::$apiClass;
+		}
+
+		throw new Exception(sprintf("%s (%s) - %s",
+			self::getModelClassName(),
+			class_basename(static::$apiClass),
+			self::DEFAULT_ERRORS['invalid_api_class']
+		));
 	}
 
 	/**
@@ -255,9 +286,18 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	private static function getApiClassName()
+	public static function getApiClassName()
 	{
-		return class_basename(static::$apiClass);
+		if (class_exists(static::$apiClass))
+		{
+			class_basename(static::$apiClass);
+		}
+
+		throw new Exception(sprintf("%s (%s) - %s",
+			self::getModelClassName(),
+			class_basename(static::$apiClass),
+			self::DEFAULT_ERRORS['invalid_api_class']
+		));
 	}
 
 	/**
@@ -485,8 +525,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$this->forceFill($attr);
 		$this->reguard();
 
-		$this->model_class = static::class;
-		$this->setApiClass(static::$apiClass);
+		$this->$model_class = self::getModelClass();
+		$this->setObjApiClass(static::$apiClass);
 		$this->setStatusCodeField(static::$statusCode);
 		$this->setDataField(static::$dataField);
 		$this->exists = $exists;
@@ -611,7 +651,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return mixed|static::Class
 	 */
-	final protected function getApiClass()
+	final protected function getObjApiClass()
 	{
 		return $this->api_class;
 	}
@@ -625,9 +665,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @throws Exception
 	 */
-	final protected function setApiClass(string $class_name)
+	final protected function setObjApiClass(string $class_name)
 	{
-		if (class_exists($class_name)) {
+		if (class_exists($class_name))
+		{
 			$this->api_class = $class_name;
 
 			return $this;
@@ -635,7 +676,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 		throw new Exception(sprintf("%s (%s) - %s",
 			self::getModelClassName(),
-			self::getApiClassName(),
+			class_basename($class_name),
 			self::DEFAULT_ERRORS['invalid_api_class']
 		));
 	}
@@ -1018,7 +1059,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{
 		$json = json_encode($this->jsonSerialize(), $options);
 
-		if (json_last_error() !== JSON_ERROR_NONE) {
+		if (json_last_error() !== JSON_ERROR_NONE)
+		{
 			throw JsonEncodingException::forModel($this, json_last_error_msg());
 		}
 
