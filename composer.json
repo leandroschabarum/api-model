@@ -1,7 +1,7 @@
 {
     "name": "ordnael/api-model",
     "description": "Extendable class for REST API based models - instead of the traditional Database based one - that integrates common Laravel's Model class functionalities.",
-    "type": "project",
+    "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
