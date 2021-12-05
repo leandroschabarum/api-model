@@ -1,6 +1,6 @@
 <?php
 
-namespace Leandro\ApiModel\Console;
+namespace Ordnael\ApiModel\Console;
 
 use Illuminate\Console\Concerns\CreatesMatchingTest;
 use Illuminate\Console\GeneratorCommand;
