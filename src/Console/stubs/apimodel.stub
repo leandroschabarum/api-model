@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use Leandro\ApiModel\ApiModel;
+use Ordnael\ApiModel\ApiModel;
 use App\Apis\{{ class }}Api;
 
 class {{ class }} extends ApiModel
