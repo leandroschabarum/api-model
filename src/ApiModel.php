@@ -318,7 +318,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	protected static function boot()
 	{
-		// This method is triggered between the 'booting'
+		// This method is called between the 'booting'
 		// and 'booted' events of the ApiModel constructor
 	}
 
