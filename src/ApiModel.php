@@ -1,6 +1,6 @@
 <?php
 
-namespace Leandro\ApiModel;
+namespace Ordnael\ApiModel;
 
 use Illuminate\Http\Client\Response as ApiResponse;
 use Illuminate\Support\Str;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Leandro\ApiModel\Providers;
+namespace Ordnael\ApiModel\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Leandro\ApiModel\Console\ApiModelMakeCommand;
-use Leandro\ApiModel\Console\ApiClassMakeCommand;
+use Ordnael\ApiModel\Console\ApiModelMakeCommand;
+use Ordnael\ApiModel\Console\ApiClassMakeCommand;
 
 use Illuminate\Support\Facades\Log;
 

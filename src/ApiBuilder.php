@@ -1,6 +1,6 @@
 <?php
 
-namespace Leandro\ApiModel;
+namespace Ordnael\ApiModel;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
