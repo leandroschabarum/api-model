@@ -47,7 +47,7 @@ trait ApiBuilder
 			? $api->$api_method()
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
@@ -68,12 +68,12 @@ trait ApiBuilder
 		}
 		else
 		{
-			$status = is_array($response) ? $response['status'] : $response->status();
+			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
 
 			return [
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
-				'status' => $status,
-				'error' => (is_array($response) ? $response : $response->json())
+				'error' => (is_array($response) ? $response : $response->json()),
+				self::getStatusCodeField() => $status
 			];
 		}
 	}
@@ -94,7 +94,7 @@ trait ApiBuilder
 			? $api->$api_method($id)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
@@ -143,7 +143,7 @@ trait ApiBuilder
 			? $api->$api_method($parameters)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				self::getStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))
@@ -166,12 +166,12 @@ trait ApiBuilder
 		}
 		else
 		{
-			$status = is_array($response) ? $response['status'] : $response->status();
+			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
 
 			return [
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
-				'status' => $status,
-				'error' => (is_array($response) ? $response : $response->json())
+				'error' => (is_array($response) ? $response : $response->json()),
+				self::getStatusCodeField() => $status
 			];
 		}
 	}
@@ -240,7 +240,7 @@ trait ApiBuilder
 			? (isset($model) ? $api->$api_method($pk, $current_attributes) : $api->$api_method($current_attributes))
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				$this->getObjStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response, $api_strict))
@@ -255,12 +255,12 @@ trait ApiBuilder
 			return true;
 		}
 
-		$status = is_array($response) ? $response['status'] : $response->status();
+		$status = is_array($response) ? $response[$this->getObjStatusCodeField()] : $response->status();
 
 		return [
 			'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['saving_model_failed']),
-			'status' => $status,
-			'error' => (is_array($response) ? $response : $response->json())
+			'error' => (is_array($response) ? $response : $response->json()),
+			$this->getObjStatusCodeField() => $status
 		];
 	}
 
@@ -301,7 +301,7 @@ trait ApiBuilder
 			? $api->$api_method($pk)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
-				'status' => 404
+				$this->getObjStatusCodeField() => 404
 			];
 
 		if (self::isResponseOk($response))

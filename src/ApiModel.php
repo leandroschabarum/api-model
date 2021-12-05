@@ -83,7 +83,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @var string
 	 */
-	protected static $statusCode = 'status';
+	protected static $statusField = 'status';
 
 	/**
 	 * Property that defines the field
@@ -243,7 +243,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	final public static function getModelClass()
+	public static function getModelClass()
 	{
 		return static::class;
 	}
@@ -254,7 +254,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	final public static function getModelClassName()
+	public static function getModelClassName()
 	{
 		return class_basename(static::class);
 	}
@@ -265,7 +265,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	final public static function getApiClass()
+	public static function getApiClass()
 	{
 		if (class_exists(static::$apiClass))
 		{
@@ -286,9 +286,29 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return string
 	 */
-	final public static function getApiClassName()
+	public static function getApiClassName()
 	{
 		return class_basename(self::getApiClass());
+	}
+
+	/**
+	 * Static method to return the status code field name.
+	 *
+	 * @return string
+	 */
+	public static function getStatusCodeField()
+	{
+		return static::$statusField;
+	}
+
+	/**
+	 * Static method to return the data field name.
+	 *
+	 * @return string
+	 */
+	public static function getDataField()
+	{
+		return static::$dataField;
 	}
 
 	/**
@@ -389,9 +409,9 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		{
 			$accepted = $is_ok($response->status());
 		}
-		else if (is_array($response) && array_key_exists($this->getStatusCodeField(), $response))
+		else if (is_array($response) && array_key_exists(self::getStatusCodeField(), $response))
 		{
-			$accepted = $is_ok($response[$this->getStatusCodeField()]);
+			$accepted = $is_ok($response[self::getStatusCodeField()]);
 		}
 		else if (ctype_digit((string) $response))
 		{
@@ -516,10 +536,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$this->forceFill($attr);
 		$this->reguard();
 
-		$this->model_class = self::getModelClass();
 		$this->setObjApiClass(static::$apiClass);
-		$this->setStatusCodeField(static::$statusCode);
-		$this->setDataField(static::$dataField);
+		$this->setObjStatusCodeField(static::$statusField);
+		$this->setObjDataField(static::$dataField);
+		$this->model_class = self::getModelClass();
 		$this->exists = $exists;
 
 		if (!isset(static::$booted[static::class]))
@@ -677,7 +697,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @return string
 	 */
-	final protected function getStatusCodeField()
+	final protected function getObjStatusCodeField()
 	{
 		return $this->status_code;
 	}
@@ -688,7 +708,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  string  $field
 	 * @return ApiModel
 	 */
-	final protected function setStatusCodeField(string $field)
+	final protected function setObjStatusCodeField(string $field)
 	{
 		$this->status_code = $field;
 
@@ -700,7 +720,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @return string
 	 */
-	final protected function getDataField()
+	final protected function getObjDataField()
 	{
 		return $this->data_field;
 	}
@@ -711,7 +731,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  string  $field
 	 * @return ApiModel
 	 */
-	final protected function setDataField(string $field)
+	final protected function setObjDataField(string $field)
 	{
 		$this->data_field = $field;
 
