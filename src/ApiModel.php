@@ -290,7 +290,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{
 		if (class_exists(static::$apiClass))
 		{
-			class_basename(static::$apiClass);
+			return class_basename(static::$apiClass);
 		}
 
 		throw new Exception(sprintf("%s (%s) - %s",
