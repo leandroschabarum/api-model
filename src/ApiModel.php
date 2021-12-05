@@ -525,7 +525,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$this->forceFill($attr);
 		$this->reguard();
 
-		$this->$model_class = self::getModelClass();
+		$this->model_class = self::getModelClass();
 		$this->setObjApiClass(static::$apiClass);
 		$this->setStatusCodeField(static::$statusCode);
 		$this->setDataField(static::$dataField);
