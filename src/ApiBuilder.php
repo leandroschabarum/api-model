@@ -14,7 +14,7 @@ trait ApiBuilder
 	 * Static method to create an ApiModel and save it.
 	 * 
 	 * @param  array  $properties
-	 * @return mixed|$this
+	 * @return ApiModel
 	 */
 	final public static function create(array $properties)
 	{
@@ -35,7 +35,7 @@ trait ApiBuilder
 	/**
 	 * Static method to return a collection of all ApiModels.
 	 * 
-	 * @return mixed|\Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection|array
 	 */
 	final public static function all()
 	{
@@ -63,10 +63,7 @@ trait ApiBuilder
 				($contents[self::getDataField()] ?? [])
 			);
 
-			return [
-				'collection' => collect($models),
-				'count' => count($models)
-			];
+			return collect($models);
 		}
 		else
 		{
@@ -106,8 +103,6 @@ trait ApiBuilder
 
 			return $model;
 		}
-
-		return null;
 	}
 
 	/**
@@ -133,7 +128,7 @@ trait ApiBuilder
 	 * a collection with the obtained results.
 	 * 
 	 * @param  array  $parameters
-	 * @return mixed|\Illuminate\Support\Collection
+	 * @return \Illuminate\Support\Collection|array
 	 */
 	final public static function query(array $parameters)
 	{
@@ -161,10 +156,7 @@ trait ApiBuilder
 				($contents[self::getDataField()] ?? [])
 			);
 
-			return [
-				'collection' => collect($models),
-				'count' => count($models)
-			];
+			return collect($models);
 		}
 		else
 		{
@@ -183,7 +175,7 @@ trait ApiBuilder
 	 * They must be listed under the fillable properties.
 	 * 
 	 * @param  array  $properties
-	 * @return mixed|bool
+	 * @return bool|null
 	 */
 	final public function update(array $properties)
 	{
@@ -207,7 +199,7 @@ trait ApiBuilder
 	 * Method to save changes made locally in the ApiModel object.
 	 * 
 	 * @param  bool  $api_strict
-	 * @return mixed|bool
+	 * @return bool|array
 	 */
 	final public function save(bool $api_strict = false)
 	{
@@ -268,6 +260,8 @@ trait ApiBuilder
 	 * Method to save changes made locally in the ApiModel object,
 	 * however in case there is any failure, it throws an Exception.
 	 * 
+	 * @return bool
+	 * 
 	 * @throws Exception
 	 */
 	final public function saveOrFail()
@@ -284,6 +278,8 @@ trait ApiBuilder
 	 * Method to remove object from ApiModel.
 	 * 
 	 * @return bool
+	 * 
+	 * @throws LogicException
 	 */
 	final public function delete()
 	{

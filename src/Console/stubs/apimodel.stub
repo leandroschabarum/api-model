@@ -20,7 +20,7 @@ class {{ class }} extends ApiModel
 	];
 
 	/**
-	 * REST API field name mapping for automatic conversion in ApiModel.
+	 * REST API field name mapping for automatic translation in ApiModel.
 	 */
 	protected static $field_mapping = [
 		//
