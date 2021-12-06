@@ -29,7 +29,7 @@ class {{ class }}
 	}
 
 	/**
-	 * Retrieve single API resources.
+	 * Retrieve single API resource.
 	 * 
 	 * @param  mixed  $id
 	 * @return \Illuminate\Http\Client\Response
