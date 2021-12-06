@@ -63,7 +63,7 @@ trait ApiBuilder
 				($contents[self::getDataField()] ?? [])
 			);
 
-			return [
+			return (object) [
 				'collection' => collect($models),
 				'count' => count($models)
 			];
@@ -161,7 +161,7 @@ trait ApiBuilder
 				($contents[self::getDataField()] ?? [])
 			);
 
-			return [
+			return (object) [
 				'collection' => collect($models),
 				'count' => count($models)
 			];
