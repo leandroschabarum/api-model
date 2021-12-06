@@ -20,3 +20,9 @@ for the inner workings of your model. The ApiModel should behave similar to the 
 ```bash
 php artisan make:apimodel <name>
 ```
+
+----
+
+#### Status
+
+Currently in development. Any bugs or feature requests can be opened under Issues (templates are available).
