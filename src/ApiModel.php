@@ -376,12 +376,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @return array
 	 */
 	final protected static function convertIdToNamedFields(array $attr = [])
-	{
-		if (is_array(static::$field_mapping) && empty(static::$field_mapping))
-		{
-			return array_intersect_key($attr, array_flip(static::$fields));
-		}
-		
+	{		
 		$id_referenced_fields = self::hasReferenceById($attr);
 
 		if (! empty($id_referenced_fields))
@@ -389,10 +384,9 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 			foreach ($id_referenced_fields as $field => $value)
 			{
 				$field_name = self::getAttributeName($field);
-				$converted[$field_name ?? $field] = $value;
+				unset($attr[$field]);
+				$attr[$field_name ?? $field] = $value;
 			}
-
-			$attr = $converted;
 		}
 
 		return array_intersect_key($attr, array_flip(static::$fields));
