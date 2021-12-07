@@ -353,16 +353,19 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{
 		if (is_array(static::$field_mapping) && ! empty(static::$field_mapping))
 		{
-			$attributes = array_keys($attr);
 			$flipped_field_mapping = array_flip(static::$field_mapping);
 
-			foreach ($attributes as $field)
-			{
-				if (array_key_exists($field, $flipped_field_mapping)) { return true; }
-			}
+			$id_referenced_fields = array_filter(
+				$attr,
+				function ($field) use ($flipped_field_mapping)
+				{
+					return array_key_exists($field, $flipped_field_mapping);
+				},
+				ARRAY_FILTER_USE_KEY
+			);
 		}
 
-		return false;
+		return $id_referenced_fields ?? [];
 	}
 
 	/**
@@ -378,9 +381,12 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		{
 			return array_intersect_key($attr, array_flip(static::$fields));
 		}
-		else if (self::hasReferenceById($attr))
+		
+		$id_referenced_fields = self::hasReferenceById($attr);
+
+		if (! empty($id_referenced_fields))
 		{
-			foreach ($attr as $field => $value)
+			foreach ($id_referenced_fields as $field => $value)
 			{
 				$field_name = self::getAttributeName($field);
 				$converted[$field_name ?? $field] = $value;
