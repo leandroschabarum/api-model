@@ -83,14 +83,15 @@ trait ApiBuilder
 	 * @param  mixed  $id
 	 * @return ApiModel
 	 */
-	final public static function find($id)
+	final public static function find($id, ...$args)
 	{
 		$ApiClass = self::getApiClass();
 		$api = new $ApiClass();
 		$api_method = "read" . Str::singular(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
-			? $api->$api_method($id)
+			? call_user_func_array(array($api, $api_method), array_unshift($args, $id))
+			//? $api->$api_method($id)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
@@ -114,9 +115,10 @@ trait ApiBuilder
 	 * 
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	final public static function findOrFail($id)
+	final public static function findOrFail($id, ...$args)
 	{
-		$model = self::find($id);
+		$model = call_user_func_array(array(self::getModelClass(), 'find'), array_unshift($args, $id));
+		//$model = self::find($id);
 
 		if (isset($model) && $model->exists) { return $model; }
 
@@ -171,7 +173,7 @@ trait ApiBuilder
 	}
 
 	/**
-	 * Method for updating an object's properties via the API.
+	 * Method for updating an object's properties with the API.
 	 * They must be listed under the fillable properties.
 	 * 
 	 * @param  array  $properties
@@ -281,7 +283,7 @@ trait ApiBuilder
 	 * 
 	 * @throws LogicException
 	 */
-	final public function delete()
+	final public function delete(...$args)
 	{
 		$pk = $this->getKey();
 
@@ -294,7 +296,8 @@ trait ApiBuilder
 
 		$api_method = "delete" . Str::singular(self::getModelClassName());
 		$response = method_exists($api, $api_method)
-			? $api->$api_method($pk)
+			? call_user_func_array(array($api, $api_method), array_unshift($args, $pk))
+			//? $api->$api_method($pk)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				$this->getObjStatusCodeField() => 404
