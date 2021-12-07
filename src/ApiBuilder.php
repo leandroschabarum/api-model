@@ -60,7 +60,7 @@ trait ApiBuilder
 				{
 					return new $ModelClass($attr, true);
 				},
-				($contents[self::getDataField()] ?? [])
+				(is_null(self::getDataField()) ? $contents : ($contents[self::getDataField()] ?? []))
 			);
 
 			return collect($models);
@@ -155,7 +155,7 @@ trait ApiBuilder
 				{
 					return new $ModelClass($attr, true);
 				},
-				($contents[self::getDataField()] ?? [])
+				(is_null(self::getDataField()) ? $contents : ($contents[self::getDataField()] ?? []))
 			);
 
 			return collect($models);

@@ -731,7 +731,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  string  $field
 	 * @return ApiModel
 	 */
-	final protected function setObjDataField(string $field)
+	final protected function setObjDataField(string $field = null)
 	{
 		$this->data_field = $field;
 
