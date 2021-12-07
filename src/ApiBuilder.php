@@ -19,8 +19,8 @@ trait ApiBuilder
 	final public static function create(array $properties)
 	{
 		$ModelClass = self::getModelClass();
-
 		$model = new $ModelClass($properties);
+
 		$model->fireModelEvent('creating', false);
 		$created = $model->save();
 
@@ -41,8 +41,8 @@ trait ApiBuilder
 	{
 		$ApiClass = self::getApiClass();
 		$api = new $ApiClass();
-
 		$api_method = "read" . Str::plural(self::getModelClassName());
+
 		$response = method_exists($api, $api_method)
 			? $api->$api_method()
 			: [
@@ -83,14 +83,15 @@ trait ApiBuilder
 	 * @param  mixed  $id
 	 * @return ApiModel
 	 */
-	final public static function find($id)
+	final public static function find($id, ...$args)
 	{
 		$ApiClass = self::getApiClass();
 		$api = new $ApiClass();
 		$api_method = "read" . Str::singular(self::getModelClassName());
+		array_unshift($args, $id);
 
 		$response = method_exists($api, $api_method)
-			? $api->$api_method($id)
+			? call_user_func_array(array($api, $api_method), $args)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
@@ -114,9 +115,10 @@ trait ApiBuilder
 	 * 
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
-	final public static function findOrFail($id)
+	final public static function findOrFail($id, ...$args)
 	{
-		$model = self::find($id);
+		array_unshift($args, $id);
+		$model = call_user_func_array(array(self::getModelClass(), 'find'), $args);
 
 		if (isset($model) && $model->exists) { return $model; }
 
@@ -134,8 +136,8 @@ trait ApiBuilder
 	{
 		$ApiClass = self::getApiClass();
 		$api = new $ApiClass();
-
 		$api_method = "read" . Str::plural(self::getModelClassName());
+
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($parameters)
 			: [
@@ -171,7 +173,7 @@ trait ApiBuilder
 	}
 
 	/**
-	 * Method for updating an object's properties via the API.
+	 * Method for updating an object's properties with the API.
 	 * They must be listed under the fillable properties.
 	 * 
 	 * @param  array  $properties
@@ -281,7 +283,7 @@ trait ApiBuilder
 	 * 
 	 * @throws LogicException
 	 */
-	final public function delete()
+	final public function delete(...$args)
 	{
 		$pk = $this->getKey();
 
@@ -291,10 +293,11 @@ trait ApiBuilder
 
 		$ApiClass = $this->getObjApiClass();
 		$api = new $ApiClass();
-
 		$api_method = "delete" . Str::singular(self::getModelClassName());
+		array_unshift($args, $pk);
+
 		$response = method_exists($api, $api_method)
-			? $api->$api_method($pk)
+			? call_user_func_array(array($api, $api_method), $args)
 			: [
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				$this->getObjStatusCodeField() => 404
