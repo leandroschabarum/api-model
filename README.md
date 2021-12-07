@@ -1,7 +1,7 @@
 # ApiModel
 ### _REST API based models_
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/leandroschabarum/api-model) ![GitHub issues](https://img.shields.io/github/issues/leandroschabarum/api-model) ![GitHub](https://img.shields.io/github/license/leandroschabarum/api-model)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/leandroschabarum/api-model?color=0074b7) ![Packagist Downloads](https://img.shields.io/packagist/dt/ordnael/api-model?color=0074b7) ![GitHub issues](https://img.shields.io/github/issues/leandroschabarum/api-model?color=59981a) ![GitHub](https://img.shields.io/github/license/leandroschabarum/api-model?color=59981a)
 
 Extendable class for REST API based models that integrates common Laravel's Model class functionalities.
 
