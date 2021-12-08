@@ -2,8 +2,10 @@
 
 namespace Ordnael\ApiModel;
 
+use Illuminate\Http\Client\Response as ApiResponse;
 use Exception;
 use LogicException;
+use InvalidArgumentException;
 
 trait Helpers
 {
@@ -82,6 +84,16 @@ trait Helpers
 	}
 
 	/**
+	 * Static method to return the total field name.
+	 *
+	 * @return string
+	 */
+	public static function getTotalField()
+	{
+		return static::$totalField;
+	}
+
+	/**
 	 * Static method to return the attribute
 	 * identifier for the ApiModel object.
 	 * 
@@ -123,6 +135,50 @@ trait Helpers
 		$flipped_field_mapping = array_flip(static::$field_mapping);
 
 		return isset($flipped_field_mapping[$id]) && is_string($flipped_field_mapping[$id]) ? $flipped_field_mapping[$id] : null;
+	}
+
+	/**
+	 * Static method to check response status code from REST API.
+	 * 
+	 * @param  mixed  $response
+	 * @param  bool   $strict
+	 * @return bool
+	 * 
+	 * @throws InvalidArgumentException|Exception
+	 */
+	final protected static function isResponseOk($response, bool $strict = false)
+	{
+		$is_ok = function ($code) { return ((int) $code >= 200 && (int) $code < 300); };
+
+		if ($response instanceof ApiResponse && method_exists($response, 'status'))
+		{
+			$accepted = $is_ok($response->status());
+		}
+		else if (is_array($response) && array_key_exists(self::getStatusCodeField(), $response))
+		{
+			$accepted = $is_ok($response[self::getStatusCodeField()]);
+		}
+		else if (ctype_digit((string) $response))
+		{
+			$accepted = $is_ok($response);
+		}
+
+		if (! isset($accepted))
+		{
+			throw new InvalidArgumentException("Unable to process response status code.");
+		}
+
+		if ($strict && $accepted !== true)
+		{
+			throw new Exception(sprintf("%s (%s%s) - %s",
+				self::getModelClassName(),
+				self::getApiClassName(),
+				(isset($response['message']) ? sprintf(":\t%s", $response['message']) : null),
+				self::DEFAULT_ERRORS['bad_api_request_code']
+			));
+		}
+
+		return $accepted;
 	}
 
 	/**

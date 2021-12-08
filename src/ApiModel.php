@@ -2,7 +2,6 @@
 
 namespace Ordnael\ApiModel;
 
-use Illuminate\Http\Client\Response as ApiResponse;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Eloquent\MassAssignmentException;
@@ -20,11 +19,10 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 
 use ArrayAccess;
 use JsonSerializable;
-use Exception;
-use LogicException;
-use InvalidArgumentException;
 use ReturnTypeWillChange;
 use ReflectionClass;
+use Exception;
+use LogicException;
 
 abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, Jsonable, JsonSerializable, UrlRoutable
 {
@@ -97,12 +95,12 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Property that defines the field containing
-	 * indexes from the API responses converted
+	 * total counts from the API responses converted
 	 * or received as array types.
 	 * 
 	 * @var string
 	 */
-	protected static $indexField = 'all';
+	protected static $totalField = 'all';
 
 	/**
 	 * Property that defines ApiModel
@@ -183,20 +181,28 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	private $api_class = null;
 
 	/**
-	 * Property that stores the status code field
-	 * name from API responses in array format.
+	 * Property that stores the status code
+	 * field name from API responses.
 	 * 
 	 * @var string
 	 */
 	protected $status_code = null;
 
 	/**
-	 * Property that stores the data field
-	 * name from API responses.
+	 * Property that stores the data
+	 * field name from API responses.
 	 * 
 	 * @var string
 	 */
 	protected $data_field = null;
+
+	/**
+	 * Property that stores the total count
+	 * field name from API responses.
+	 * 
+	 * @var string
+	 */
+	protected $total_field = null;
 
 	/**
 	 * Indicates whether the ApiModel exists.
@@ -330,50 +336,6 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	}
 
 	/**
-	 * Static method to check response status code from REST API
-	 * 
-	 * @param  mixed  $response
-	 * @param  bool   $strict
-	 * @return bool
-	 * 
-	 * @throws InvalidArgumentException|Exception
-	 */
-	final protected static function isResponseOk($response, bool $strict = false)
-	{
-		$is_ok = function ($code) { return ((int) $code >= 200 && (int) $code < 300); };
-
-		if ($response instanceof ApiResponse && method_exists($response, 'status'))
-		{
-			$accepted = $is_ok($response->status());
-		}
-		else if (is_array($response) && array_key_exists(self::getStatusCodeField(), $response))
-		{
-			$accepted = $is_ok($response[self::getStatusCodeField()]);
-		}
-		else if (ctype_digit((string) $response))
-		{
-			$accepted = $is_ok($response);
-		}
-
-		if (! isset($accepted))
-		{
-			throw new InvalidArgumentException("Unable to process response status code.");
-		}
-
-		if ($strict && $accepted !== true)
-		{
-			throw new Exception(sprintf("%s (%s%s) - %s",
-				self::getModelClassName(),
-				self::getApiClassName(),
-				(isset($response['message']) ? sprintf(":\t%s", $response['message']) : null),
-				self::DEFAULT_ERRORS['bad_api_request_code']
-			));
-		}
-
-		return $accepted;
-	}
-
-	/**
 	 * Method to prevent external relations
 	 * from being lazy loaded in ApiModel.
 	 *
@@ -430,9 +392,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$this->forceFill($attr);
 		$this->reguard();
 
-		$this->setObjApiClass(static::$apiClass);
-		$this->setObjStatusCodeField(static::$statusField);
-		$this->setObjDataField(static::$dataField);
+		$this->setObjApiClass(static::$apiClass)
+			 ->setObjStatusCodeField(static::$statusField)
+			 ->setObjDataField(static::$dataField)
+			 ->setObjTotalField(static::$totalField);
 		$this->model_class = self::getModelClass();
 		$this->exists = $exists;
 
@@ -628,6 +591,29 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	final protected function setObjDataField(string $field = null)
 	{
 		$this->data_field = $field;
+
+		return $this;
+	}
+
+	/**
+	 * Method to return the total field name.
+	 *
+	 * @return string
+	 */
+	final protected function getObjTotalField()
+	{
+		return $this->total_field;
+	}
+
+	/**
+	 * Method to change the total field name.
+	 *
+	 * @param  string  $field
+	 * @return $this
+	 */
+	final protected function setObjTotalField(string $field = null)
+	{
+		$this->total_field = $field;
 
 		return $this;
 	}
@@ -1004,6 +990,20 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	}
 
 	/**
+	 * Method to force filling of attributes not listed as fillable.
+	 * It is recommended to use fill() instead to not overwrite protected attributes.
+	 * 
+	 * @param  array  $properties
+	 * @return void
+	 */
+	final protected function forceFill(array $properties)
+	{
+		return static::unguarded(
+			function () use ($properties) {	return $this->fill($properties); }
+		);
+	}
+
+	/**
 	 * Method for filling attributes listed as fillable.
 	 * 
 	 * @param  array  $properties
@@ -1033,19 +1033,5 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 				);
 			}
 		}
-	}
-
-	/**
-	 * Method to force filling of attributes not listed as fillable.
-	 * It is recommended to use fill() instead to not overwrite protected attributes.
-	 * 
-	 * @param  array  $properties
-	 * @return void
-	 */
-	private function forceFill(array $properties)
-	{
-		return static::unguarded(
-			function () use ($properties) {	return $this->fill($properties); }
-		);
 	}
 }
