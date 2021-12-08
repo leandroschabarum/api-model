@@ -14,7 +14,7 @@ trait ApiBuilder
 	 * Static method to create an ApiModel and save it.
 	 * 
 	 * @param  array  $properties
-	 * @return ApiModel
+	 * @return $this
 	 */
 	final public static function create(array $properties)
 	{
@@ -81,7 +81,7 @@ trait ApiBuilder
 	 * Static method to find an ApiModel.
 	 * 
 	 * @param  mixed  $id
-	 * @return ApiModel
+	 * @return $this
 	 */
 	final public static function find($id, ...$args)
 	{
@@ -111,7 +111,7 @@ trait ApiBuilder
 	 * it doesn't exist, throws an Exception.
 	 * 
 	 * @param  mixed  $id
-	 * @return ApiModel
+	 * @return $this
 	 * 
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
