@@ -23,6 +23,7 @@ use ReturnTypeWillChange;
 use ReflectionClass;
 use Exception;
 use LogicException;
+use InvalidArgumentException;
 
 abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, Jsonable, JsonSerializable, UrlRoutable
 {
@@ -564,9 +565,16 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
+	 * 
+	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjStatusCodeField(string $field)
 	{
+		if (! self::isValidKeyPath($field))
+		{
+			throw new InvalidArgumentException(sprintf('[%s] Status field is not valid.', $field));
+		}
+
 		$this->status_code = $field;
 
 		return $this;
@@ -587,9 +595,16 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
+	 * 
+	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjDataField(string $field = null)
 	{
+		if (! self::isValidKeyPath($field))
+		{
+			throw new InvalidArgumentException(sprintf('[%s] Data field is not valid.', $field));
+		}
+
 		$this->data_field = $field;
 
 		return $this;
@@ -610,9 +625,16 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
+	 * 
+	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjTotalField(string $field = null)
 	{
+		if (! self::isValidKeyPath($field))
+		{
+			throw new InvalidArgumentException(sprintf('[%s] Total field is not valid.', $field));
+		}
+
 		$this->total_field = $field;
 
 		return $this;

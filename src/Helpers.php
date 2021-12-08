@@ -146,24 +146,26 @@ trait Helpers
 	 * 
 	 * @throws InvalidArgumentException|Exception
 	 */
-	final protected static function isResponseOk($response, bool $strict = false)
+	final protected static function isResponseCodeOk($response, bool $strict = false)
 	{
-		$is_ok = function ($code) { return ((int) $code >= 200 && (int) $code < 300); };
-
-		if ($response instanceof ApiResponse && method_exists($response, 'status'))
+		if ($response instanceof ApiResponse)
 		{
-			$accepted = $is_ok($response->status());
+			$code = $response->status();
 		}
-		else if (is_array($response) && array_key_exists(self::getStatusCodeField(), $response))
+		else if (is_array($response))
 		{
-			$accepted = $is_ok($response[self::getStatusCodeField()]);
+			$code = self::getKeyPathValue($response, self::getStatusCodeField());
 		}
 		else if (ctype_digit((string) $response))
 		{
-			$accepted = $is_ok($response);
+			$code = $response;
 		}
 
-		if (! isset($accepted))
+		if (isset($code) && in_array(gettype($code), ['integer', 'string']))
+		{
+			$accepted = ((int) $code >= 200 && (int) $code < 300);
+		}
+		else
 		{
 			throw new InvalidArgumentException("Unable to process response status code.");
 		}
@@ -182,6 +184,18 @@ trait Helpers
 	}
 
 	/**
+	 * Static method to check if
+	 * string is a valid key path.
+	 * 
+	 * @param  string  $path
+	 * @return bool
+	 */
+	final protected static function isValidKeyPath(string $path = null)
+	{
+		return (preg_match('%^[a-zA-Z0-9_\+\-\:\\\/]+(?:(?:\.[a-zA-Z0-9_\+\-\:\\\/]+)*|[^\.\s])$%', $path) || $path === null);
+	}
+
+	/**
 	 * Static method to follow key path string
 	 * in array and retrieve its value.
 	 * 
@@ -189,17 +203,17 @@ trait Helpers
 	 * @param  string $path
 	 * @return mixed
 	 * 
-	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
-	protected static function getKeyPathValue(array $array, string $path)
+	final protected static function getKeyPathValue(array $array, string $path = null)
 	{
-		if (preg_match('%^[a-zA-Z0-9_\+\-\:\\\/]+(?:(?:\.[a-zA-Z0-9_\+\-\:\\\/]+)*|[^\.\s])$%', $path))
+		if (self::isValidKeyPath($path))
 		{
 			// IMPORTANT! followKeyPath() should ONLY be called after key path string is validated
-			return self::followKeyPath(explode('.', $path), $array);
+			return isset($path) ? self::followKeyPath(explode('.', $path), $array) : $array;
 		}
 
-		throw new Exception("Key path ({$path}) is not defined properly on ApiModel.");
+		throw new InvalidArgumentException(sprintf('Key path (%s) is not valid.', $path));
 	}
 
 	/**
@@ -222,5 +236,41 @@ trait Helpers
 		$current_key = array_shift($keys);
 
 		return self::followKeyPath($keys, $partition[$current_key]);
+	}
+
+	/**
+	 * Static method to make fake response
+	 * array for reporting errors.
+	 * 
+	 * @param  array  $blueprint
+	 * @return array
+	 */
+	private static function mockResponseArray(array $blueprint)
+	{
+		// $blueprint has to be an associative array, where the keys are
+		// absolute paths to the targets that are supposed to be created
+		$response_like_array = [];
+
+		foreach ($blueprint as $key_path => $content)
+		{
+			if (! self::isValidKeyPath($key_path)) { continue; }
+
+			$nodes = explode('.', $key_path);
+			$partition =& $response_like_array;
+
+			foreach ($nodes as $node)
+			{
+				if (! isset($partition[$node]))
+				{
+					$partition[$node] = [];
+				}
+
+				$partition =& $partition[$node];
+			}
+
+			$partition = $content;
+		}
+
+		return $response_like_array;
 	}
 }

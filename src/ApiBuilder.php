@@ -45,12 +45,12 @@ trait ApiBuilder
 
 		$response = method_exists($api, $api_method)
 			? $api->$api_method()
-			: [
+			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
-			];
+			]);
 
-		if (self::isResponseOk($response))
+		if (self::isResponseCodeOk($response))
 		{
 			$ModelClass = self::getModelClass();
 			$contents = is_array($response) ? $response : $response->json();
@@ -60,20 +60,23 @@ trait ApiBuilder
 				{
 					return new $ModelClass($attr, true);
 				},
-				(is_null(self::getDataField()) ? $contents : ($contents[self::getDataField()] ?? []))
+				(self::getKeyPathValue($contents, self::getDataField()) ?? [])
 			);
 
-			return collect($models);
+			return (object) [
+				'collection' => collect($models),
+				'total' => self::getKeyPathValue($contents, self::getTotalField())
+			];
 		}
 		else
 		{
-			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
+			$status = is_array($response) ? self::getKeyPathValue($response, self::getStatusCodeField()) : $response->status();
 
-			return [
+			return self::mockResponseArray([
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
 				'error' => (is_array($response) ? $response : $response->json()),
 				self::getStatusCodeField() => $status
-			];
+			]);
 		}
 	}
 
@@ -92,12 +95,12 @@ trait ApiBuilder
 
 		$response = method_exists($api, $api_method)
 			? call_user_func_array(array($api, $api_method), $args)
-			: [
+			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
-			];
+			]);
 
-		if (self::isResponseOk($response))
+		if (self::isResponseCodeOk($response))
 		{
 			$ModelClass = self::getModelClass();
 			$model = new $ModelClass((is_array($response) ? $response : $response->json()), true);
@@ -140,12 +143,12 @@ trait ApiBuilder
 
 		$response = method_exists($api, $api_method)
 			? $api->$api_method($parameters)
-			: [
+			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
-			];
+			]);
 
-		if (self::isResponseOk($response))
+		if (self::isResponseCodeOk($response))
 		{
 			$ModelClass = self::getModelClass();
 			$contents = is_array($response) ? $response : $response->json();
@@ -155,20 +158,23 @@ trait ApiBuilder
 				{
 					return new $ModelClass($attr, true);
 				},
-				(is_null(self::getDataField()) ? $contents : ($contents[self::getDataField()] ?? []))
+				(self::getKeyPathValue($contents, self::getDataField()) ?? [])
 			);
 
-			return collect($models);
+			return (object) [
+				'collection' => collect($models),
+				'total' => self::getKeyPathValue($contents, self::getTotalField())
+			];
 		}
 		else
 		{
-			$status = is_array($response) ? $response[self::getStatusCodeField()] : $response->status();
+			$status = is_array($response) ? self::getKeyPathValue($response, self::getStatusCodeField()) : $response->status();
 
-			return [
+			return self::mockResponseArray([
 				'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['model_not_found']),
 				'error' => (is_array($response) ? $response : $response->json()),
 				self::getStatusCodeField() => $status
-			];
+			]);
 		}
 	}
 
@@ -232,12 +238,12 @@ trait ApiBuilder
 
 		$response = method_exists($api, $api_method)
 			? (isset($model) ? $api->$api_method($pk, $current_attributes) : $api->$api_method($current_attributes))
-			: [
+			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				$this->getObjStatusCodeField() => 404
-			];
+			]);
 
-		if (self::isResponseOk($response, $api_strict))
+		if (self::isResponseCodeOk($response, $api_strict))
 		{
 			$pk = $this->getKeyName();
 			$this->$pk = $response[$pk] ?? null;
@@ -249,13 +255,13 @@ trait ApiBuilder
 			return true;
 		}
 
-		$status = is_array($response) ? $response[$this->getObjStatusCodeField()] : $response->status();
+		$status = is_array($response) ? self::getKeyPathValue($response, $this->getObjStatusCodeField()) : $response->status();
 
-		return [
+		return self::mockResponseArray([
 			'message' => sprintf("%d - %s", $status, self::DEFAULT_ERRORS['saving_model_failed']),
 			'error' => (is_array($response) ? $response : $response->json()),
 			$this->getObjStatusCodeField() => $status
-		];
+		]);
 	}
 
 	/**
@@ -298,12 +304,12 @@ trait ApiBuilder
 
 		$response = method_exists($api, $api_method)
 			? call_user_func_array(array($api, $api_method), $args)
-			: [
+			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				$this->getObjStatusCodeField() => 404
-			];
+			]);
 
-		if (self::isResponseOk($response))
+		if (self::isResponseCodeOk($response))
 		{
 			$this->exists = false;
 			$this->setAttribute($this->getKeyName(), null);
