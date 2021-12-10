@@ -44,7 +44,7 @@ trait ApiBuilder
 		$api_method = "read" . Str::plural(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
-			? $api->$api_method()
+			? $api->{$api_method}()
 			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
@@ -142,7 +142,7 @@ trait ApiBuilder
 		$api_method = "read" . Str::plural(self::getModelClassName());
 
 		$response = method_exists($api, $api_method)
-			? $api->$api_method($parameters)
+			? $api->{$api_method}($parameters)
 			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				self::getStatusCodeField() => 404
@@ -237,7 +237,7 @@ trait ApiBuilder
 		$api = new $ApiClass();
 
 		$response = method_exists($api, $api_method)
-			? (isset($model) ? $api->$api_method($pk, $current_attributes) : $api->$api_method($current_attributes))
+			? (isset($model) ? $api->{$api_method}($pk, $current_attributes) : $api->{$api_method}($current_attributes))
 			: self::mockResponseArray([
 				'message' => sprintf("%s - %s", $api_method, self::DEFAULT_ERRORS['api_method_not_found']),
 				$this->getObjStatusCodeField() => 404

@@ -6,8 +6,6 @@ use Illuminate\Support\ServiceProvider;
 use Ordnael\ApiModel\Console\ApiModelMakeCommand;
 use Ordnael\ApiModel\Console\ApiClassMakeCommand;
 
-use Illuminate\Support\Facades\Log;
-
 class ApiModelServiceProvider extends ServiceProvider
 {
 	/**
@@ -27,8 +25,7 @@ class ApiModelServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-		// boot code...
-		Log::info('ApiModelServiceProvider has been booted');
+		//
 	}
 
 	/**

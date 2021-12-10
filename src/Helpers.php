@@ -192,7 +192,7 @@ trait Helpers
 	 */
 	final protected static function isValidKeyPath(string $path = null)
 	{
-		return (preg_match('%^[a-zA-Z0-9_\+\-\:\\\/]+(?:(?:\.[a-zA-Z0-9_\+\-\:\\\/]+)*|[^\.\s])$%', $path) || $path === null);
+		return (preg_match('/^[a-zA-Z0-9_\+\-\:\\\/]+(?:(?:\.[a-zA-Z0-9_\+\-\:\\\/]+)*|[^\.\s])$/', $path) || $path === null);
 	}
 
 	/**
