@@ -389,10 +389,6 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final public function __construct(array $attr = [], bool $exists = false)
 	{
-		$this->syncOriginal();
-		$this->forceFill($attr);
-		$this->reguard();
-
 		$this->setObjApiClass(static::$apiClass)
 			 ->setObjStatusCodeField(static::$statusField)
 			 ->setObjDataField(static::$dataField)
@@ -411,6 +407,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 			$this->fireModelEvent('booted', false);
 		}
+
+		$this->syncOriginal();
+		$this->forceFill($attr);
+		$this->reguard();
 	}
 
 	/**
@@ -761,7 +761,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		}
 		else if ($this->isRelation($attr))
 		{
-			$this->setRelation($attr, $this->$attr($contents));
+			$this->setRelation($attr, $this->{$attr}($contents));
 			
 			return $this->getRelation($attr);
 		}
@@ -1038,8 +1038,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$totallyGuarded = $this->totallyGuarded();
 		$properties = array_filter(
 			array_merge(array_fill_keys(static::$fields, null), self::convertIdToNamedFields($properties)),
-			function ($attr) { return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr); },
-			ARRAY_FILTER_USE_KEY
+			function ($value, $attr) { return preg_match('/^[a-zA-Z_][a-zA-Z0-9_]+$/', (string) $attr) && isset($value); },
+			ARRAY_FILTER_USE_BOTH
 		);
 
 		foreach ($this->fillableFromArray($properties) as $attr => $value)
