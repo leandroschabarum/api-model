@@ -24,8 +24,7 @@ trait ApiBuilder
 		$model->fireModelEvent('creating', false);
 		$created = $model->save();
 
-		if ($created === true)
-		{
+		if ($created === true) {
 			$model->fireModelEvent('created', false);
 
 			return $model;
@@ -50,26 +49,22 @@ trait ApiBuilder
 				self::getStatusCodeField() => 404
 			]);
 
-		if (self::isResponseCodeOk($response))
-		{
+		if (self::isResponseCodeOk($response)) {
 			$ModelClass = self::getModelClass();
 			$contents = is_array($response) ? $response : $response->json();
 
 			$models = array_map(
-				function ($attr) use ($ModelClass)
-				{
+				function ($attr) use ($ModelClass) {
 					return new $ModelClass($attr, true);
 				},
-				(self::getKeyPathValue($contents, self::getDataField()) ?? [])
+				self::getKeyPathValue($contents, self::getDataField()) ?? []
 			);
 
 			return (object) [
 				'collection' => collect($models),
 				'total' => self::getKeyPathValue($contents, self::getTotalField())
 			];
-		}
-		else
-		{
+		} else {
 			$status = is_array($response) ? self::getKeyPathValue($response, self::getStatusCodeField()) : $response->status();
 
 			return self::mockResponseArray([
@@ -100,8 +95,7 @@ trait ApiBuilder
 				self::getStatusCodeField() => 404
 			]);
 
-		if (self::isResponseCodeOk($response))
-		{
+		if (self::isResponseCodeOk($response)) {
 			$ModelClass = self::getModelClass();
 			$model = new $ModelClass((is_array($response) ? $response : $response->json()), true);
 
@@ -123,7 +117,7 @@ trait ApiBuilder
 		array_unshift($args, $id);
 		$model = call_user_func_array(array(self::getModelClass(), 'find'), $args);
 
-		if (isset($model) && $model->exists) { return $model; }
+		if (isset($model) && $model->exists) return $model;
 
 		throw (new ModelNotFoundException)->setModel(self::getModelClassName(), $id);
 	}
@@ -148,26 +142,22 @@ trait ApiBuilder
 				self::getStatusCodeField() => 404
 			]);
 
-		if (self::isResponseCodeOk($response))
-		{
+		if (self::isResponseCodeOk($response)) {
 			$ModelClass = self::getModelClass();
 			$contents = is_array($response) ? $response : $response->json();
 
 			$models = array_map(
-				function ($attr) use ($ModelClass)
-				{
+				function ($attr) use ($ModelClass) {
 					return new $ModelClass($attr, true);
 				},
-				(self::getKeyPathValue($contents, self::getDataField()) ?? [])
+				self::getKeyPathValue($contents, self::getDataField()) ?? []
 			);
 
 			return (object) [
 				'collection' => collect($models),
 				'total' => self::getKeyPathValue($contents, self::getTotalField())
 			];
-		}
-		else
-		{
+		} else {
 			$status = is_array($response) ? self::getKeyPathValue($response, self::getStatusCodeField()) : $response->status();
 
 			return self::mockResponseArray([
@@ -187,13 +177,11 @@ trait ApiBuilder
 	 */
 	final public function update(array $properties)
 	{
-		if (! empty($properties) && $this->fireModelEvent('updating') === true)
-		{
+		if (! empty($properties) && $this->fireModelEvent('updating') === true) {
 			$this->fill($properties);
 			$updated = $this->save();
 
-			if ($updated === true)
-			{
+			if ($updated === true) {
 				$this->fireModelEvent('updated', false);
 
 				return true;
@@ -214,24 +202,21 @@ trait ApiBuilder
 		$this->mergeAttributesFromClassCasts();
 		$pk = $this->getKey();
 
-		if (isset($pk) && $this->exists)
-		{
+		if (isset($pk) && $this->exists) {
 			$model = self::find($pk);
 
-			if (! isset($model)) { return false; }
+			if (! isset($model)) return false;
 
 			$api_method = "update" . Str::singular(self::getModelClassName());
-		}
-		else
-		{
+		} else {
 			$api_method = "create" . Str::singular(self::getModelClassName());
 		}
 
 		$current_attributes = $this->attributesToArray();
 
-		if ($this->fireModelEvent('saving') === false) { return false; }
+		if ($this->fireModelEvent('saving') === false) return false;
 
-		if (isset($model) && ! $model->hasChanges($current_attributes)) { return true; }
+		if (isset($model) && ! $model->hasChanges($current_attributes)) return true;
 
 		$ApiClass = $this->getObjApiClass();
 		$api = new $ApiClass();
@@ -243,8 +228,7 @@ trait ApiBuilder
 				$this->getObjStatusCodeField() => 404
 			]);
 
-		if (self::isResponseCodeOk($response, $api_strict))
-		{
+		if (self::isResponseCodeOk($response, $api_strict)) {
 			$pk = $this->getKeyName();
 			$this->$pk = $response[$pk] ?? null;
 			$this->exists = true;
@@ -274,7 +258,7 @@ trait ApiBuilder
 	 */
 	final public function saveOrFail()
 	{
-		if ($this->save(true) === true) { return true; }
+		if ($this->save(true) === true) return true;
 
 		throw new Exception(sprintf("%s - %s",
 			self::getModelClassName(),
@@ -293,9 +277,9 @@ trait ApiBuilder
 	{
 		$pk = $this->getKey();
 
-		if (! isset($pk)) { throw new LogicException("No primary key defined on ApiModel."); }
-		if (! $this->exists) { return true; }
-		if ($this->fireModelEvent('deleting') === false) { return false; }
+		if (! isset($pk)) throw new LogicException("No primary key defined on ApiModel.");
+		if (! $this->exists) return true;
+		if ($this->fireModelEvent('deleting') === false) return false;
 
 		$ApiClass = $this->getObjApiClass();
 		$api = new $ApiClass();
@@ -309,8 +293,7 @@ trait ApiBuilder
 				$this->getObjStatusCodeField() => 404
 			]);
 
-		if (self::isResponseCodeOk($response))
-		{
+		if (self::isResponseCodeOk($response)) {
 			$this->exists = false;
 			$this->setAttribute($this->getKeyName(), null);
 			$this->fireModelEvent('deleted', false);

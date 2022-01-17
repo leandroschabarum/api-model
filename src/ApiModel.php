@@ -266,9 +266,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{
 		$attributes = array_keys($attr);
 
-		foreach ($attributes as $field)
-		{
-			if (ctype_digit((string) $field)) { return true; }
+		foreach ($attributes as $field) {
+			if (ctype_digit((string) $field)) return true;
 		}
 
 		return false;
@@ -283,14 +282,12 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected static function hasReferenceById(array $attr = [])
 	{
-		if (is_array(static::$field_mapping) && ! empty(static::$field_mapping))
-		{
+		if (is_array(static::$field_mapping) && ! empty(static::$field_mapping)) {
 			$flipped_field_mapping = array_flip(static::$field_mapping);
 
 			$id_referenced_fields = array_filter(
 				$attr,
-				function ($field) use ($flipped_field_mapping)
-				{
+				function ($field) use ($flipped_field_mapping) {
 					return array_key_exists($field, $flipped_field_mapping);
 				},
 				ARRAY_FILTER_USE_KEY
@@ -323,10 +320,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{		
 		$id_referenced_fields = self::hasReferenceById($attr);
 
-		if (! empty($id_referenced_fields))
-		{
-			foreach ($id_referenced_fields as $field => $value)
-			{
+		if (! empty($id_referenced_fields)) {
+			foreach ($id_referenced_fields as $field => $value) {
 				$field_name = self::getAttributeName($field);
 				unset($attr[$field]);
 				$attr[$field_name ?? $field] = $value;
@@ -396,8 +391,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$this->model_class = self::getModelClass();
 		$this->exists = $exists;
 
-		if (!isset(static::$booted[static::class]))
-		{
+		if (!isset(static::$booted[static::class])) {
 			static::$booted[static::class] = true;
 			$this->fireModelEvent('booting', false);
 
@@ -536,8 +530,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected function setObjApiClass(string $class_name)
 	{
-		if (class_exists($class_name))
-		{
+		if (class_exists($class_name)) {
 			$this->api_class = $class_name;
 
 			return $this;
@@ -570,8 +563,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected function setObjStatusCodeField(string $field)
 	{
-		if (! self::isValidKeyPath($field))
-		{
+		if (! self::isValidKeyPath($field)) {
 			throw new InvalidArgumentException(sprintf('[%s] Status field is not valid.', $field));
 		}
 
@@ -600,8 +592,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected function setObjDataField(string $field = null)
 	{
-		if (! self::isValidKeyPath($field))
-		{
+		if (! self::isValidKeyPath($field)) {
 			throw new InvalidArgumentException(sprintf('[%s] Data field is not valid.', $field));
 		}
 
@@ -630,8 +621,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected function setObjTotalField(string $field = null)
 	{
-		if (! self::isValidKeyPath($field))
-		{
+		if (! self::isValidKeyPath($field)) {
 			throw new InvalidArgumentException(sprintf('[%s] Total field is not valid.', $field));
 		}
 
@@ -755,12 +745,9 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	public function getRelationValue(string $attr, $contents = null)
 	{
-		if ($this->relationLoaded($attr))
-		{
+		if ($this->relationLoaded($attr)) {
 			return $this->getRelation($attr);
-		}
-		else if ($this->isRelation($attr))
-		{
+		} else if ($this->isRelation($attr)) {
 			$this->setRelation($attr, $this->{$attr}($contents));
 			
 			return $this->getRelation($attr);
@@ -899,8 +886,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	public function resolveRouteBinding($value, $field = null)
 	{
-		if (isset($field) && $field !== $this->getRouteKeyName())
-		{
+		if (isset($field) && $field !== $this->getRouteKeyName()) {
 			throw new Exception(sprintf("Non primaryKey field <%s> not supported.", (string) $field));
 		}
 
@@ -918,8 +904,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	public function resolveChildRouteBinding($childType, $value, $field)
 	{
-		if (isset($field) && $field !== $this->getRouteKeyName())
-		{
+		if (isset($field) && $field !== $this->getRouteKeyName()) {
 			throw new Exception(sprintf("Non primaryKey field <%s> not supported.", (string) $field));
 		}
 
@@ -972,8 +957,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	{
 		$json = json_encode($this->jsonSerialize(), $options);
 
-		if (json_last_error() !== JSON_ERROR_NONE)
-		{
+		if (json_last_error() !== JSON_ERROR_NONE) {
 			throw JsonEncodingException::forModel($this, json_last_error_msg());
 		}
 
@@ -1001,8 +985,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final protected function hasChanges(array $properties = [])
 	{
-		if (! empty($properties))
-		{
+		if (! empty($properties)) {
 			$original = $this->attributesToArray();
 
 			return $properties != $original;
@@ -1042,14 +1025,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 			ARRAY_FILTER_USE_BOTH
 		);
 
-		foreach ($this->fillableFromArray($properties) as $attr => $value)
-		{
-			if ($this->isFillable($attr))
-			{
+		foreach ($this->fillableFromArray($properties) as $attr => $value) {
+			if ($this->isFillable($attr)) {
 				$this->setAttribute($attr, $this->getRelationValue($attr, $value));
-			}
-			else if ($totallyGuarded)
-			{
+			} else if ($totallyGuarded) {
 				throw new MassAssignmentException(
 					sprintf("Add [%s] to fillable property to allow mass assignment on [%s].", $attr, get_class($this))
 				);
