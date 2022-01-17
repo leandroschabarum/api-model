@@ -156,6 +156,13 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	protected static $lazyLoadingViolationCallback;
 
 	/**
+	 * Stores modified attributes on model.
+	 * 
+	 * @var array
+	 */
+	private $modified = [];
+
+	/**
 	 * Indicates whether lazy loading will
 	 * be prevented in the ApiModel.
 	 *
@@ -429,6 +436,9 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 */
 	final public function __set($attr, $value)
 	{
+		// add attributes to list of modified fields
+		if ($this->getAttribute($attr) != $value) $this->modified[] = $attr;
+
 		$this->setAttribute($attr, $value);
 	}
 
@@ -974,6 +984,16 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	public function jsonSerialize()
 	{
 		return $this->toArray();
+	}
+
+	/**
+	 * Retrieve list of modified attributes on model.
+	 * 
+	 * @return array
+	 */
+	public function getChanges()
+	{
+		return $this->modified ?? [];
 	}
 
 	/**
