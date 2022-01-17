@@ -1005,7 +1005,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		{
 			$original = $this->attributesToArray();
 
-			return ($properties != $original);
+			return $properties != $original;
 		}
 
 		return false;
