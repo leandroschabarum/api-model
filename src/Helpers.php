@@ -39,10 +39,7 @@ trait Helpers
 	 */
 	public static function getApiClass()
 	{
-		if (class_exists(static::$apiClass))
-		{
-			return static::$apiClass;
-		}
+		if (class_exists(static::$apiClass)) return static::$apiClass;
 
 		throw new Exception(sprintf("%s (%s) - %s",
 			self::getModelClassName(),
@@ -102,16 +99,13 @@ trait Helpers
 	 */
 	final public static function getAttributeId(string $attr)
 	{
-		if (is_array(static::$field_mapping) && empty(static::$field_mapping))
-		{
+		if (is_array(static::$field_mapping) && empty(static::$field_mapping)) {
 			throw new LogicException("No field mapping is defined on ApiModel.");
-		}
-		else if (! is_array(static::$field_mapping) || self::hasNumericReference(static::$field_mapping))
-		{
+		} else if (! is_array(static::$field_mapping) || self::hasNumericReference(static::$field_mapping)) {
 			throw new LogicException("Field mapping is not defined properly on ApiModel.");
 		}
 
-		return isset(static::$field_mapping[$attr]) ? static::$field_mapping[$attr] : null;
+		return static::$field_mapping[$attr] ?? null;
 	}
 
 	/**
@@ -123,12 +117,10 @@ trait Helpers
 	 */
 	final public static function getAttributeName($id)
 	{
-		if (is_array(static::$field_mapping) && empty(static::$field_mapping))
-		{
+		if (is_array(static::$field_mapping) && empty(static::$field_mapping)) {
 			throw new LogicException("No field mapping is defined on ApiModel.");
 		}
-		else if (! is_array(static::$field_mapping) || self::hasNumericReference(static::$field_mapping))
-		{
+		else if (! is_array(static::$field_mapping) || self::hasNumericReference(static::$field_mapping)) {
 			throw new LogicException("Field mapping is not defined properly on ApiModel.");
 		}
 
@@ -148,30 +140,21 @@ trait Helpers
 	 */
 	final protected static function isResponseCodeOk($response, bool $strict = false)
 	{
-		if ($response instanceof ApiResponse)
-		{
+		if ($response instanceof ApiResponse) {
 			$code = $response->status();
-		}
-		else if (is_array($response))
-		{
+		} else if (is_array($response)) {
 			$code = self::getKeyPathValue($response, self::getStatusCodeField());
-		}
-		else if (ctype_digit((string) $response))
-		{
+		} else if (ctype_digit((string) $response)) {
 			$code = $response;
 		}
 
-		if (isset($code) && in_array(gettype($code), ['integer', 'string']))
-		{
+		if (isset($code) && in_array(gettype($code), ['integer', 'string'])) {
 			$accepted = ((int) $code >= 200 && (int) $code < 300);
-		}
-		else
-		{
+		} else {
 			throw new InvalidArgumentException("Unable to process response status code.");
 		}
 
-		if ($strict && $accepted !== true)
-		{
+		if ($strict && $accepted !== true) {
 			throw new Exception(sprintf("%s (%s%s) - %s",
 				self::getModelClassName(),
 				self::getApiClassName(),
@@ -207,8 +190,7 @@ trait Helpers
 	 */
 	final protected static function getKeyPathValue(array $array, string $path = null)
 	{
-		if (self::isValidKeyPath($path))
-		{
+		if (self::isValidKeyPath($path)) {
 			// IMPORTANT! followKeyPath() should ONLY be called after key path string is validated
 			return isset($path) ? self::followKeyPath(explode('.', $path), $array) : $array;
 		}
@@ -226,8 +208,7 @@ trait Helpers
 	 */
 	private static function followKeyPath(array $keys, &$partition)
 	{
-		if (empty($keys) || ! is_array($partition))
-		{
+		if (empty($keys) || ! is_array($partition)) {
 			// completed walking key path OR
 			// current partition is not "walkable" anymore
 			return $partition;
@@ -251,19 +232,14 @@ trait Helpers
 		// absolute paths to the targets that are supposed to be created
 		$response_like_array = [];
 
-		foreach ($blueprint as $key_path => $content)
-		{
-			if (! self::isValidKeyPath($key_path)) { continue; }
+		foreach ($blueprint as $key_path => $content) {
+			if (! self::isValidKeyPath($key_path)) continue;
 
 			$nodes = explode('.', $key_path);
 			$partition =& $response_like_array;
 
-			foreach ($nodes as $node)
-			{
-				if (! isset($partition[$node]))
-				{
-					$partition[$node] = [];
-				}
+			foreach ($nodes as $node) {
+				if (! isset($partition[$node])) $partition[$node] = [];
 
 				$partition =& $partition[$node];
 			}

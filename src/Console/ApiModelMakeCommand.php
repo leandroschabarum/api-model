@@ -39,27 +39,21 @@ class ApiModelMakeCommand extends GeneratorCommand
 	 */
 	public function handle()
 	{
-		if (parent::handle() === false && ! $this->option('force'))
-		{
-			return false;
-		}
+		if (parent::handle() === false && ! $this->option('force')) return false;
 
 		$this->createApiClass();
 
-		if ($this->option('all'))
-		{
+		if ($this->option('all')) {
 			$this->input->setOption('controller', true);
 			$this->input->setOption('policy', true);
 			$this->input->setOption('resource', true);
 		}
 
-		if ($this->option('controller') || $this->option('resource') || $this->option('api'))
-		{
+		if ($this->option('controller') || $this->option('resource') || $this->option('api')) {
 			$this->createController();
 		}
 
-		if ($this->option('policy'))
-		{
+		if ($this->option('policy')) {
 			$this->createPolicy();
 		}
 	}
