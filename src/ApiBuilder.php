@@ -181,11 +181,7 @@ trait ApiBuilder
 			$this->fill($properties);
 			$updated = $this->save();
 
-			if ($updated === true) {
-				$this->fireModelEvent('updated', false);
-
-				return true;
-			}
+			if ($updated === true) $this->fireModelEvent('updated', false);
 
 			return $updated;
 		}
