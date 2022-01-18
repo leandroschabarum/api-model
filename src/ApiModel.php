@@ -991,7 +991,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return array
 	 */
-	final public function getChanges()
+	final protected function getChanges()
 	{
 		return $this->modified ?? [];
 	}
@@ -1002,9 +1002,21 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  string  $attr
 	 * @return void
 	 */
-	final public function setChanged(string $attr)
+	final protected function setChanged(string $attr)
 	{
 		if (! in_array($attr, $this->getChanges(), true)) $this->modified[] = $attr;
+	}
+
+	/**
+	 * Resets tracked changes on ApiModel object.
+	 * 
+	 * @return $this
+	 */
+	final protected function unsetChanges()
+	{
+		$this->modified = [];
+
+		return $this;
 	}
 
 	/**
@@ -1017,12 +1029,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  array  $properties
 	 * @return bool
 	 */
-	final public function hasChanges(array $properties = [])
+	final protected function hasChanges(array $properties = [])
 	{
 		if (! empty($properties)) {
 			$original = array_intersect_key($this->attributesToArray(), $properties);
-
-			dump($original); // DEBUG
 
 			return $properties != $original;
 		}

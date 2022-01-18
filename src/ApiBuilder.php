@@ -207,12 +207,14 @@ trait ApiBuilder
 
 			if (! isset($model)) return false;
 
+			$current_attributes = array_intersect_key($this->attributesToArray(), array_flip($this->getChanges()));
 			$api_method = "update" . Str::singular(self::getModelClassName());
 		} else {
+			$current_attributes = $this->attributesToArray();
 			$api_method = "create" . Str::singular(self::getModelClassName());
 		}
 
-		$current_attributes = $this->attributesToArray();
+		dump($current_attributes); // DEBUG
 
 		if ($this->fireModelEvent('saving') === false) return false;
 
@@ -235,6 +237,7 @@ trait ApiBuilder
 
 			$this->fireModelEvent('saved', false);
 			$this->syncOriginal();
+			$this->unsetChanges();
 
 			return true;
 		}
