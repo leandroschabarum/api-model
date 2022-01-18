@@ -214,8 +214,6 @@ trait ApiBuilder
 			$api_method = "create" . Str::singular(self::getModelClassName());
 		}
 
-		dump($current_attributes); // DEBUG
-
 		if ($this->fireModelEvent('saving') === false) return false;
 
 		if (isset($model) && ! $model->hasChanges($current_attributes)) return true;
