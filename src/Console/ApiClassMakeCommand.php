@@ -40,10 +40,7 @@ class ApiClassMakeCommand extends GeneratorCommand
 	 */
 	public function handle()
 	{
-		if (parent::handle() === false && ! $this->option('force'))
-		{
-			return false;
-		}
+		if (parent::handle() === false && ! $this->option('force')) return false;
 	}
 
 	/**
@@ -55,7 +52,7 @@ class ApiClassMakeCommand extends GeneratorCommand
 	protected function buildClass($name)
 	{
 		$stub = parent::buildClass($name);
-
+		
 		$model = $this->option('apimodel');
 
 		return $this->replaceModel($stub, $model);

@@ -156,7 +156,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	protected static $lazyLoadingViolationCallback;
 
 	/**
-	 * Stores modified attributes on model.
+	 * Stores modified attributes on ApiModel object.
 	 * 
 	 * @var array
 	 */
@@ -410,7 +410,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		}
 
 		$this->syncOriginal();
-		$this->forceFill($attr);
+		$this->forceFill($attr, false);
 		$this->reguard();
 	}
 
@@ -437,7 +437,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	final public function __set($attr, $value)
 	{
 		// add attributes to list of modified fields
-		if ($this->getAttribute($attr) != $value) $this->modified[] = $attr;
+		if ($this->getAttribute($attr) != $value) $this->setChanged($attr);
 
 		$this->setAttribute($attr, $value);
 	}
@@ -991,40 +991,56 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * 
 	 * @return array
 	 */
-	public function getChanges()
+	final public function getChanges()
 	{
 		return $this->modified ?? [];
 	}
 
 	/**
+	 * Add field name to list of modified attributes on model.
+	 * 
+	 * @param  string  $attr
+	 * @return void
+	 */
+	final public function setChanged(string $attr)
+	{
+		if (! in_array($attr, $this->getChanges(), true)) $this->modified[] = $attr;
+	}
+
+	/**
 	 * Method to check whether properties cause changes
-	 * to the attributes of the instantiated object.
+	 * to the attributes of the instantiated object. If
+	 * properties are not provided or are empty then
+	 * checks wheter there are tracked changes on the
+	 * object itself.
 	 * 
 	 * @param  array  $properties
 	 * @return bool
 	 */
-	final protected function hasChanges(array $properties = [])
+	final public function hasChanges(array $properties = [])
 	{
 		if (! empty($properties)) {
-			$original = $this->attributesToArray();
+			$original = array_intersect_key($this->attributesToArray(), $properties);
+
+			dump($original); // DEBUG
 
 			return $properties != $original;
 		}
 
-		return false;
+		return ! empty($this->getChanges());
 	}
 
 	/**
 	 * Method to force filling of attributes not listed as fillable.
 	 * It is recommended to use fill() instead to not overwrite protected attributes.
 	 * 
-	 * @param  array  $properties
+	 * @param  mixed ...$args
 	 * @return void
 	 */
-	final protected function forceFill(array $properties)
+	final protected function forceFill(...$args)
 	{
 		return static::unguarded(
-			function () use ($properties) {	return $this->fill($properties); }
+			function () use ($args) { return $this->fill(...$args); }
 		);
 	}
 
@@ -1032,11 +1048,12 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Method for filling attributes listed as fillable.
 	 * 
 	 * @param  array  $properties
+	 * @param  bool   $track_changes
 	 * @return void
 	 * 
 	 * @throws \Illuminate\Database\Eloquent\MassAssignmentException
 	 */
-	final public function fill(array $properties)
+	final public function fill(array $properties, bool $track_changes = true)
 	{
 		$totallyGuarded = $this->totallyGuarded();
 		$properties = array_filter(
@@ -1047,6 +1064,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 		foreach ($this->fillableFromArray($properties) as $attr => $value) {
 			if ($this->isFillable($attr)) {
+				if ($track_changes && $this->getAttribute($attr) != $value) $this->setChanged($attr);
+
 				$this->setAttribute($attr, $this->getRelationValue($attr, $value));
 			} else if ($totallyGuarded) {
 				throw new MassAssignmentException(
