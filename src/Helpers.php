@@ -12,7 +12,7 @@ trait Helpers
 	/**
 	 * Static method to return the
 	 * class extending ApiModel.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getModelClass()
@@ -23,7 +23,7 @@ trait Helpers
 	/**
 	 * Static method to return the name
 	 * of the ApiModel extending class.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getModelClassName()
@@ -34,7 +34,7 @@ trait Helpers
 	/**
 	 * Static method to return the class
 	 * making API calls for the ApiModel object.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getApiClass()
@@ -52,7 +52,7 @@ trait Helpers
 	 * Static method to return the name
 	 * of the class making API calls for
 	 * the ApiModel object.
-	 * 
+	 *
 	 * @return string
 	 */
 	public static function getApiClassName()
@@ -93,7 +93,7 @@ trait Helpers
 	/**
 	 * Static method to return the attribute
 	 * identifier for the ApiModel object.
-	 * 
+	 *
 	 * @param  string  $attr
 	 * @return mixed
 	 */
@@ -111,7 +111,7 @@ trait Helpers
 	/**
 	 * Static method to return the attribute
 	 * name of the ApiModel object.
-	 * 
+	 *
 	 * @param  mixed  $id
 	 * @return string|null
 	 */
@@ -131,11 +131,11 @@ trait Helpers
 
 	/**
 	 * Static method to check response status code from REST API.
-	 * 
+	 *
 	 * @param  mixed  $response
 	 * @param  bool   $strict
 	 * @return bool
-	 * 
+	 *
 	 * @throws InvalidArgumentException|Exception
 	 */
 	final protected static function isResponseCodeOk($response, bool $strict = false)
@@ -169,7 +169,7 @@ trait Helpers
 	/**
 	 * Static method to check if
 	 * string is a valid key path.
-	 * 
+	 *
 	 * @param  string  $path
 	 * @return bool
 	 */
@@ -181,11 +181,11 @@ trait Helpers
 	/**
 	 * Static method to follow key path string
 	 * in array and retrieve its value.
-	 * 
+	 *
 	 * @param  array  $array
 	 * @param  string $path
 	 * @return mixed
-	 * 
+	 *
 	 * @throws InvalidArgumentException
 	 */
 	final protected static function getKeyPathValue(array $array, string $path = null)
@@ -201,7 +201,7 @@ trait Helpers
 	/**
 	 * Recursive static method to walk
 	 * array representation of key path.
-	 * 
+	 *
 	 * @param  array  $keys
 	 * @param  mixed  &$partition
 	 * @return mixed
@@ -222,7 +222,7 @@ trait Helpers
 	/**
 	 * Static method to make fake response
 	 * array for reporting errors.
-	 * 
+	 *
 	 * @param  array  $blueprint
 	 * @return array
 	 */
