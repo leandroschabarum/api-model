@@ -29,6 +29,9 @@ trait ApiBuilder
 
 			return $model;
 		}
+
+		// Retrieves HTTP response on failure to create ApiModel
+		return $created;
 	}
 
 	/**
