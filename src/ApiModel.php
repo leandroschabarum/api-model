@@ -40,7 +40,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Constant for standard error messages.
-	 * 
+	 *
 	 * @var array
 	 */
 	const DEFAULT_ERRORS = [
@@ -71,7 +71,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Holds the calling ApiModel class name.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected static $apiClass = null;
@@ -80,7 +80,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Property that defines the field containing
 	 * the status code from responses converted
 	 * or received as array types.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected static $statusField = 'status';
@@ -89,7 +89,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Property that defines the field containing
 	 * data from the API responses converted
 	 * or received as array types.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected static $dataField = 'data';
@@ -98,7 +98,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Property that defines the field containing
 	 * total counts from the API responses converted
 	 * or received as array types.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected static $totalField = 'all';
@@ -106,7 +106,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Property that defines ApiModel
 	 * attributes from REST API fields.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected static $fields = [];
@@ -114,7 +114,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Property that holds ApiModel reference
 	 * attributes for REST API field mapping.
-	 * 
+	 *
 	 * @var array
 	 */
 	protected static $field_mapping = [];
@@ -156,8 +156,16 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	protected static $lazyLoadingViolationCallback;
 
 	/**
+	 * Stores if the model will send only
+	 * changed attributes on update calls.
+	 *
+	 * @var bool
+	 */
+	protected onlyDiff = true;
+
+	/**
 	 * Stores modified attributes on ApiModel object.
-	 * 
+	 *
 	 * @var array
 	 */
 	private $modified = [];
@@ -174,7 +182,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Property that stores the extended class
 	 * that called the constructor for the
 	 * ApiModel object.
-	 * 
+	 *
 	 * @var string
 	 */
 	private $model_class = null;
@@ -183,7 +191,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Property that stores the class
 	 * responsible for API requests calls
 	 * when building the ApiModel object.
-	 * 
+	 *
 	 * @var string
 	 */
 	private $api_class = null;
@@ -191,7 +199,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Property that stores the status code
 	 * field name from API responses.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $status_code = null;
@@ -199,7 +207,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Property that stores the data
 	 * field name from API responses.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $data_field = null;
@@ -207,7 +215,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Property that stores the total count
 	 * field name from API responses.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $total_field = null;
@@ -232,7 +240,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * Class property that defines the
 	 * name of the attribute to be used
 	 * as primary key in the ApiModel object.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected $primaryKey = 'id';
@@ -265,7 +273,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Static method to check presence of
 	 * number-referenced fields from REST API.
-	 * 
+	 *
 	 * @param  array  $attr
 	 * @return bool
 	 */
@@ -283,7 +291,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Static method to check presence of
 	 * ID-referenced fields from REST API.
-	 * 
+	 *
 	 * @param  array  $attr
 	 * @return bool
 	 */
@@ -319,12 +327,12 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Static method for converting ID-referenced
 	 * attributes to name-referencing.
-	 * 
+	 *
 	 * @param  array  $attr
 	 * @return array
 	 */
 	final protected static function convertIdToNamedFields(array $attr = [])
-	{		
+	{
 		$id_referenced_fields = self::hasReferenceById($attr);
 
 		if (! empty($id_referenced_fields)) {
@@ -385,7 +393,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Base constructor for API request Models objects.
-	 * 
+	 *
 	 * @param  array  $attr
 	 * @return void
 	 */
@@ -417,7 +425,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Special method to dynamically return
 	 * attribute values from ApiModel object.
-	 * 
+	 *
 	 * @param  string  $attr
 	 * @return mixed
 	 */
@@ -429,7 +437,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Special method for dynamically assigning
 	 * values to attributes of ApiModel object.
-	 * 
+	 *
 	 * @param  string  $attr
 	 * @param  mixed   $value
 	 * @return void
@@ -521,7 +529,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Method to return the class name for the
 	 * API methods of the ApiModel object.
-	 * 
+	 *
 	 * @return string
 	 */
 	final protected function getObjApiClass()
@@ -535,7 +543,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $class_name
 	 * @return $this
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	final protected function setObjApiClass(string $class_name)
@@ -568,7 +576,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
-	 * 
+	 *
 	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjStatusCodeField(string $field)
@@ -597,7 +605,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
-	 * 
+	 *
 	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjDataField(string $field = null)
@@ -626,7 +634,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @param  string  $field
 	 * @return $this
-	 * 
+	 *
 	 * @throws InvalidArgumentException
 	 */
 	final protected function setObjTotalField(string $field = null)
@@ -759,7 +767,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 			return $this->getRelation($attr);
 		} else if ($this->isRelation($attr)) {
 			$this->setRelation($attr, $this->{$attr}($contents));
-			
+
 			return $this->getRelation($attr);
 		}
 
@@ -891,7 +899,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * @param  mixed   $value
 	 * @param  string  $field
 	 * @return $this
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public function resolveRouteBinding($value, $field = null)
@@ -988,7 +996,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Retrieve list of modified attributes on model.
-	 * 
+	 *
 	 * @return array
 	 */
 	final protected function getChanges()
@@ -998,7 +1006,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Add field name to list of modified attributes on model.
-	 * 
+	 *
 	 * @param  string  $attr
 	 * @return void
 	 */
@@ -1009,7 +1017,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Resets tracked changes on ApiModel object.
-	 * 
+	 *
 	 * @return $this
 	 */
 	final protected function unsetChanges()
@@ -1025,7 +1033,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 * properties are not provided or are empty then
 	 * checks wheter there are tracked changes on the
 	 * object itself.
-	 * 
+	 *
 	 * @param  array  $properties
 	 * @return bool
 	 */
@@ -1043,7 +1051,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	/**
 	 * Method to force filling of attributes not listed as fillable.
 	 * It is recommended to use fill() instead to not overwrite protected attributes.
-	 * 
+	 *
 	 * @param  mixed ...$args
 	 * @return void
 	 */
@@ -1056,11 +1064,11 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 	/**
 	 * Method for filling attributes listed as fillable.
-	 * 
+	 *
 	 * @param  array  $properties
 	 * @param  bool   $track_changes
 	 * @return void
-	 * 
+	 *
 	 * @throws \Illuminate\Database\Eloquent\MassAssignmentException
 	 */
 	final public function fill(array $properties, bool $track_changes = true)
@@ -1068,8 +1076,8 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 		$totallyGuarded = $this->totallyGuarded();
 		$properties = array_filter(
 			array_merge(array_fill_keys(static::$fields, null), self::convertIdToNamedFields($properties)),
-			function ($value, $attr) { return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr) && isset($value); },
-			ARRAY_FILTER_USE_BOTH
+			function ($attr) { return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr); },
+			ARRAY_FILTER_USE_KEY
 		);
 
 		foreach ($this->fillableFromArray($properties) as $attr => $value) {

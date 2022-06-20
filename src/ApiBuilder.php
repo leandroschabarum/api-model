@@ -12,7 +12,7 @@ trait ApiBuilder
 {
 	/**
 	 * Static method to create an ApiModel and save it.
-	 * 
+	 *
 	 * @param  array  $properties
 	 * @return $this
 	 */
@@ -29,11 +29,14 @@ trait ApiBuilder
 
 			return $model;
 		}
+
+		// Retrieves HTTP response on failure to create ApiModel
+		return $created;
 	}
 
 	/**
 	 * Static method to return a collection of all ApiModels.
-	 * 
+	 *
 	 * @return \Illuminate\Support\Collection|array
 	 */
 	final public static function all()
@@ -77,7 +80,7 @@ trait ApiBuilder
 
 	/**
 	 * Static method to find an ApiModel.
-	 * 
+	 *
 	 * @param  mixed  $id
 	 * @return $this
 	 */
@@ -106,10 +109,10 @@ trait ApiBuilder
 	/**
 	 * Static method to find an ApiModel, however if
 	 * it doesn't exist, throws an Exception.
-	 * 
+	 *
 	 * @param  mixed  $id
 	 * @return $this
-	 * 
+	 *
 	 * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
 	 */
 	final public static function findOrFail($id, ...$args)
@@ -125,7 +128,7 @@ trait ApiBuilder
 	/**
 	 * Static method to search ApiModels and return
 	 * a collection with the obtained results.
-	 * 
+	 *
 	 * @param  array  $parameters
 	 * @return \Illuminate\Support\Collection|array
 	 */
@@ -171,7 +174,7 @@ trait ApiBuilder
 	/**
 	 * Method for updating an object's properties with the API.
 	 * They must be listed under the fillable properties.
-	 * 
+	 *
 	 * @param  array  $properties
 	 * @return bool|null
 	 */
@@ -189,7 +192,7 @@ trait ApiBuilder
 
 	/**
 	 * Method to save changes made locally in the ApiModel object.
-	 * 
+	 *
 	 * @param  bool  $api_strict
 	 * @return bool|array
 	 */
@@ -203,7 +206,9 @@ trait ApiBuilder
 
 			if (! isset($model)) return false;
 
-			$current_attributes = array_intersect_key($this->attributesToArray(), array_flip($this->getChanges()));
+			$current_attributes = static::onlyDiff
+				? array_intersect_key($this->attributesToArray(), array_flip($this->getChanges()))
+				: $this->attributesToArray();
 			$api_method = "update" . Str::singular(self::getModelClassName());
 		} else {
 			$current_attributes = $this->attributesToArray();
@@ -248,9 +253,9 @@ trait ApiBuilder
 	/**
 	 * Method to save changes made locally in the ApiModel object,
 	 * however in case there is any failure, it throws an Exception.
-	 * 
+	 *
 	 * @return bool
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	final public function saveOrFail()
@@ -265,9 +270,9 @@ trait ApiBuilder
 
 	/**
 	 * Method to remove object from ApiModel.
-	 * 
+	 *
 	 * @return bool
-	 * 
+	 *
 	 * @throws LogicException
 	 */
 	final public function delete(...$args)
