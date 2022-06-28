@@ -191,7 +191,7 @@ trait Helpers
 	final protected static function getKeyPathValue(array $array, string $path = null)
 	{
 		if (self::isValidKeyPath($path)) {
-			// IMPORTANT! followKeyPath() should ONLY be called after key path string is validated
+			// IMPORTANT! followKeyPath() should ONLY be called after key path string has been validated
 			return isset($path) ? self::followKeyPath(explode('.', $path), $array) : $array;
 		}
 
@@ -210,7 +210,7 @@ trait Helpers
 	{
 		if (empty($keys) || ! is_array($partition)) {
 			// completed walking key path OR
-			// current partition is not "walkable" anymore
+			// current partition is not walkable anymore
 			return $partition;
 		}
 		// array of keys represents a queue (FIFO)
@@ -228,11 +228,12 @@ trait Helpers
 	 */
 	private static function mockResponseArray(array $blueprint)
 	{
-		// $blueprint has to be an associative array, where the keys are
+		// 'blueprint' has to be an associative array, where the keys are
 		// absolute paths to the targets that are supposed to be created
 		$response_like_array = [];
 
 		foreach ($blueprint as $key_path => $content) {
+			// Validation guard to escape invalid key paths
 			if (! self::isValidKeyPath($key_path)) continue;
 
 			$nodes = explode('.', $key_path);
