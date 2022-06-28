@@ -161,7 +161,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @var bool
 	 */
-	protected onlyDiff = true;
+	protected $onlyDiff = true;
 
 	/**
 	 * Stores modified attributes on ApiModel object.
@@ -419,6 +419,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 		$this->syncOriginal();
 		$this->forceFill($attr, false);
+		$this->attributes = array_merge(
+			array_fill_keys(static::$fields, null),
+			$this->attributes
+		);
 		$this->reguard();
 	}
 
@@ -1097,3 +1101,4 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 			}
 		}
 	}
+}
