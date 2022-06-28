@@ -161,7 +161,7 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	 *
 	 * @var bool
 	 */
-	protected onlyDiff = true;
+	protected $onlyDiff = true;
 
 	/**
 	 * Stores modified attributes on ApiModel object.
@@ -419,6 +419,10 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 
 		$this->syncOriginal();
 		$this->forceFill($attr, false);
+		$this->attributes = array_merge(
+			array_fill_keys(static::$fields, null),
+			$this->attributes
+		);
 		$this->reguard();
 	}
 
@@ -1074,10 +1078,15 @@ abstract class ApiModel implements Arrayable, ArrayAccess, HasBroadcastChannel, 
 	final public function fill(array $properties, bool $track_changes = true)
 	{
 		$totallyGuarded = $this->totallyGuarded();
+		$fields = array_merge(
+			array_fill_keys(static::$fields, null),
+			self::convertIdToNamedFields($properties)
+		);
+
 		$properties = array_filter(
-			array_merge(array_fill_keys(static::$fields, null), self::convertIdToNamedFields($properties)),
-			function ($attr) { return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr); },
-			ARRAY_FILTER_USE_KEY
+			$fields, function ($attr) {
+				return preg_match('%^[a-zA-Z_][a-zA-Z0-9_]+$%', (string) $attr);
+			}, ARRAY_FILTER_USE_KEY
 		);
 
 		foreach ($this->fillableFromArray($properties) as $attr => $value) {
